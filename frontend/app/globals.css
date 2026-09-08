@@ -1,0 +1,491 @@
+@import "tailwindcss";
+
+@theme {
+  /* ========================================
+     DESIGN SYSTEM RH IA — LOT 11
+     ======================================== */
+
+  /* Couleurs principales */
+  --color-encre: #1c2b39;
+  --color-brume: #edf1f0;
+  --color-sauge: #3e7c74;
+  --color-ocre: #c89b3c;
+  --color-ardoise: #6b7680;
+  --color-alerte: #b0483f;
+
+  /* Sauge */
+  --color-sauge-50: #f4f9f8;
+  --color-sauge-100: #daede9;
+  --color-sauge-200: #b4dbd3;
+  --color-sauge-300: #87c1b7;
+  --color-sauge-400: #5ea399;
+  --color-sauge-500: #3e7c74;
+  --color-sauge-600: #356c66;
+  --color-sauge-700: #2d5854;
+  --color-sauge-800: #284744;
+  --color-sauge-900: #243d3b;
+
+  /* Ocre — contenu IA */
+  --color-ocre-50: #f9f6ed;
+  --color-ocre-100: #f2ebcf;
+  --color-ocre-200: #e6d6a2;
+  --color-ocre-300: #d7b96d;
+  --color-ocre-400: #c89b3c;
+  --color-ocre-500: #bb8b37;
+  --color-ocre-600: #a16e2d;
+  --color-ocre-700: #815127;
+  --color-ocre-800: #6c4327;
+  --color-ocre-900: #5d3926;
+
+  /* Ardoise — texte secondaire et bordures */
+  --color-ardoise-50: #f9fafb;
+  --color-ardoise-100: #f3f5f6;
+  --color-ardoise-200: #e5e8eb;
+  --color-ardoise-300: #d1d7db;
+  --color-ardoise-400: #9ca7af;
+  --color-ardoise-500: #6b7680;
+  --color-ardoise-600: #4b5a63;
+  --color-ardoise-700: #374651;
+  --color-ardoise-800: #1f2e37;
+  --color-ardoise-900: #111c27;
+
+  /* Alerte */
+  --color-alerte-50: #fcf5f4;
+  --color-alerte-100: #f9e8e7;
+  --color-alerte-200: #f5d6d3;
+  --color-alerte-300: #edb9b4;
+  --color-alerte-400: #e18f88;
+  --color-alerte-500: #d16b62;
+  --color-alerte-600: #b0483f;
+  --color-alerte-700: #9e3f37;
+  --color-alerte-800: #833831;
+  --color-alerte-900: #6e332e;
+
+  /* ========================================
+     TYPOGRAPHIE
+     Les variables sont fournies par next/font
+     dans layout.tsx.
+     ======================================== */
+
+  --font-heading: var(--font-rh-heading), sans-serif;
+  --font-body: var(--font-rh-body), sans-serif;
+  --font-mono: var(--font-rh-mono), monospace;
+
+  /* Tailles */
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 700;
+
+  --text-h2: 2rem;
+  --text-h2--line-height: 1.25;
+  --text-h2--font-weight: 600;
+
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.3;
+  --text-h3--font-weight: 600;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.35;
+  --text-h4--font-weight: 600;
+
+  --text-h5: 1rem;
+  --text-h5--line-height: 1.4;
+  --text-h5--font-weight: 600;
+
+  --text-h6: 0.875rem;
+  --text-h6--line-height: 1.4;
+  --text-h6--font-weight: 500;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 400;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 400;
+
+  --text-data: 1rem;
+  --text-data--line-height: 1.4;
+  --text-data--font-weight: 500;
+
+  /* ========================================
+     ESPACEMENT
+     Base : 8px
+     ======================================== */
+
+  --spacing: 0.5rem;
+
+  /* ========================================
+     BREAKPOINTS
+     ======================================== */
+
+  --breakpoint-mobile: 360px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1280px;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessibilité : réduire les animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-zoom-in,
+  .animate-slide-in-bottom {
+    animation: none;
+  }
+}
+
+/* ========================================
+   BASE
+   ======================================== */
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+
+  background-color: var(--color-brume);
+  color: var(--color-encre);
+
+  font-family: var(--font-body), sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Titres */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), sans-serif;
+  color: var(--color-encre);
+}
+
+/* Données / scores / KPI */
+.font-mono,
+[data-font="mono"] {
+  font-family: var(--font-mono), monospace;
+}
+
+/* Boutons et champs */
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-body), sans-serif;
+}
+
+/* Les boutons doivent rester interactifs */
+button {
+  cursor: pointer;
+}
+
+/* Avatar compact du profil dans l'en-tête partagé */
+header a[href="/profil"] {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+/* Désactivation du curseur pour boutons désactivés */
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Focus clavier */
+:focus-visible {
+  outline: 2px solid var(--color-sauge);
+  outline-offset: 2px;
+}
+
+/* Sélection du texte */
+::selection {
+  background-color: var(--color-sauge-100);
+  color: var(--color-encre);
+}
+
+/* ========================================
+   UTILITAIRES DESIGN SYSTEM
+   ======================================== */
+
+.ds-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(107, 118, 128, 0.12);
+  border-radius: 8px;
+}
+
+.ds-border {
+  border-color: rgba(107, 118, 128, 0.12);
+}
+
+.ds-text-primary {
+  color: var(--color-encre);
+}
+
+.ds-text-secondary {
+  color: var(--color-ardoise);
+}
+
+.ds-bg {
+  background-color: var(--color-brume);
+}
+
+.ds-primary {
+  color: #ffffff;
+  background-color: var(--color-sauge);
+}
+
+.ds-primary:hover {
+  background-color: var(--color-sauge-600);
+}
+
+.ds-ai {
+  color: var(--color-encre);
+  background-color: var(--color-ocre-50);
+  border-color: var(--color-ocre);
+}
+
+.ds-alert {
+  color: var(--color-alerte);
+  background-color: var(--color-alerte-50);
+  border-color: var(--color-alerte-200);
+}
+
+/* Keep the certificate sheet compact and place the PDF action below it. */
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.5rem;
+}
+
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child {
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(21 43 55 / 0.08);
+  padding: 0.75rem;
+}
+
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child::after {
+  content: "Signature autorisée\A Marie Lefèvre\A Direction RH";
+  white-space: pre;
+  display: block;
+  width: 12rem;
+  margin: 1rem 0 0 auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-sauge);
+  color: var(--color-ardoise);
+  font: italic 0.75rem/1.45 var(--font-body, sans-serif);
+  text-align: center;
+}
+
+/* Compact navigation glyphs. */
+aside svg { width: 1rem !important; height: 1rem !important; }
+aside > a:first-child > span:first-child { border-radius: 0.75rem; }
+
+/* Support reprend exactement le gabarit visuel de l’action Notification. */
+a[href="/support"] {
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem !important;
+  color: var(--color-encre) !important;
+}
+a[href="/support"]:hover { background-color: var(--color-sauge-50) !important; color: var(--color-encre) !important; }
+a[href="/support"] i { font-size: 1.5rem !important; line-height: 1 !important; }
+
+/* Le quiz est accessible depuis sa carte principale, pas depuis la colonne latérale. */
+aside > button.w-full { display: none !important; }
+.matrix-table thead tr { background-color: var(--color-sauge-100) !important; }
+.matrix-table th { color: var(--color-encre) !important; }
+
+/* Prévisualisation du certificat : mêmes proportions que le PDF backend. */
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl {
+  max-width: 1040px !important;
+  width: 100% !important;
+  margin-inline: auto !important;
+  padding: 0.9rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl > div.rounded-xl {
+  max-width: 940px !important;
+  width: 100% !important;
+  margin-inline: auto !important;
+  padding: 1.4rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl > div.rounded-xl > div > div > div:first-child {
+  width: 46px !important;
+  height: 46px !important;
+  font-size: 0.75rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl > div.rounded-xl > div > div.text-center {
+  width: auto !important;
+  height: auto !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl p.font-mono {
+  margin-top: 1.75rem !important;
+  font-size: 0.6rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl > div.rounded-xl > div > div.text-center > p.mt-10 {
+  margin-top: 1.5rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl > div.rounded-xl > div > div.text-center > p.mt-12,
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl > div.rounded-xl > div > div.text-center > div.mt-12 {
+  margin-top: 2rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl h2 {
+  font-size: 1.25rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-2xl h3 {
+  font-size: 1rem !important;
+}
+/* Carte de résultat : plus compacte que le certificat principal. */
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl {
+  max-width: 1200px !important;
+  margin-inline: auto !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl > div:first-child,
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl > div:nth-child(2) {
+  padding: 1rem 2rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl h2 {
+  font-size: 1.25rem !important;
+}
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl .mt-7 { margin-top: 1rem !important; }
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl .mt-8 { margin-top: 1.25rem !important; }
+main > div.mx-auto.max-w-6xl.space-y-7 > section.rounded-xl .rounded-lg.bg-brume { padding: 0.9rem !important; }
+
+/* Aide de saisie du dossier employé. */
+.lot3-editor-slot section > p:first-of-type {
+  font-size: 0 !important;
+  line-height: 1.5 !important;
+}
+.lot3-editor-slot section > p:first-of-type::after {
+  content: "Remplissez les champs selon le dossier : type, date de début et poste pour un contrat ; titre, établissement et année pour un diplôme ; titre, catégorie et lien ou clé de stockage pour un document.";
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Même traitement visuel que la carte de recommandations, en conservant le contenu du profil. */
+main > div.mx-auto.max-w-6xl > section.border-l-ocre {
+  display: block !important;
+  border-left-style: dashed !important;
+  border-left-width: 2px !important;
+  border-radius: 0 !important;
+  padding: 1.25rem !important;
+}
+.matrix-table tr { border-color: rgb(107 118 128 / 0.15) !important; }
+.matrix-table td { border-color: rgb(107 118 128 / 0.15) !important; }
+main > div.grid.gap-8 > section.space-y-6 > div.border-l-2 span.rounded.bg-ocre { display: none !important; }
+
+@media (min-width: 1280px) {
+  main > div.grid.gap-8 { position: relative; }
+  main > div.grid.gap-8 > section.space-y-6 > section:last-child {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    width: 380px;
+    margin: 0;
+  }
+}
+
+
+
+/* Profile photo uses a compact rounded square, matching the profile card design. */
+form .h-24.w-24.rounded-full,
+section.rounded-xl .h-20.w-20.rounded-full { border-radius: 0.75rem; }
+
+/* Compact certificate statistics and follow-up recommendations. */
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.rounded-xl {
+  padding: 0.75rem !important;
+}
+
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.rounded-xl > div.grid > div.rounded-lg {
+  padding: 0.5rem !important;
+}
+
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.rounded-xl h2 { font-size: 1.25rem; }
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.rounded-xl p { font-size: 0.8rem; }
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.rounded-xl:first-child { display: none; }
+
+/* Certificate score summary appears before the recommendation panel. */
+div.mx-auto.max-w-6xl.space-y-8 { display: flex; flex-direction: column; }
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 { order: 4; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm { order: 3; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-2xl > div:first-child + div { display: none; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child { padding: 1rem; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm button { padding: 0.75rem 1.25rem; font-size: 0.875rem; }
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 { margin-top: 2rem; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child > div:nth-child(2) > span.rounded-lg { min-width: 13.5rem; justify-content: center; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child > button { font-size: 0; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child > button::after { content: 'Télécharger le certificat'; font-size: 0.875rem; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm { position: relative; margin-top: 4.5rem; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child > button { position: absolute; top: -4rem; right: 1.5rem; }
+div.mx-auto.max-w-6xl.space-y-8 > section.rounded-xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child > div:nth-child(2) > p { width: 100%; max-width: none; text-align: center; }
+
+/* Keep the certificate sheet at its original comfortable size. */
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm { padding: 1rem !important; }
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child { padding: 1.5rem 1.25rem !important; }
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm { max-width: 64rem !important; padding: 2rem !important; }
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm { width: 100% !important; max-width: 72rem !important; }
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child { padding: 2rem 3rem !important; }
+section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child::after { content: none; }
+@media (min-width: 640px) {
+  section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm { padding: 1.5rem !important; }
+  section.mx-auto.max-w-4xl.rounded-2xl.border.border-ardoise\/15.bg-white.shadow-sm > div:first-child { padding: 1.5rem 2.5rem !important; }
+}
+
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.border-l-2.border-dashed {
+  padding: 1rem;
+}
+
+div.mx-auto.max-w-6xl.space-y-8 > div.grid.gap-8 > section.border-l-2.border-dashed h2 {
+  font-size: 1.125rem;
+}

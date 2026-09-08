@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rhia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rhia
+      POSTGRES_PASSWORD: rhia_dev_password
+      POSTGRES_DB: rhia_formation
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rhia -d rhia_formation"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: rhia-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: rhia-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: rhia_admin
+      MINIO_ROOT_PASSWORD: rhia_dev_password
+    ports:
+      - "9000:9000"   # API MinIO
+      - "9001:9001"   # Console web MinIO
+    volumes:
+      - minio_data:/data
+
+volumes:
+  postgres_data:
+  minio_data:

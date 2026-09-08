@@ -1,0 +1,26 @@
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+**/.next/
+**/build/
+**/coverage/
+**/test-results/
+**/playwright-report/
+
+# Environment and secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs and temporary files
+**/*.log
+**/.tmp/
+**/.temp/
+report_render/
+**/.git-backup-*/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

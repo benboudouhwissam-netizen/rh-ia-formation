@@ -89,8 +89,9 @@ export const trainingSessionsApi = {
     }),
 };
 
-export interface MatrixData {
-  utilisateurs: string[];
+  export interface MatrixData {
+    utilisateurs: string[];
+    employes?: { id: string; nom_complet: string }[];
   competences: { id: string; nom: string }[];
   cellules: { utilisateur_id: string; competence_id: string; niveau: number }[];
 }
@@ -98,8 +99,9 @@ export interface MatrixData {
 export interface CompetenceExpert {
   competence_id: string;
   competence_nom: string;
-  experts: {
-    utilisateur_id: string;
+    experts: {
+      utilisateur_id: string;
+      nom_complet?: string;
     niveau: number;
     certifications: { nom: string; organisme: string; date_obtention: string }[];
   }[];

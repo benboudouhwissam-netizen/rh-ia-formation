@@ -13,6 +13,8 @@ const profiles: Record<string, EmployeePresentation> = {
   'employee-emma': { name: 'Imane Berrada', role: 'Analyste RH', initials: 'IB' },
   'employee-farid': { name: 'Farid El Mansouri', role: 'Ingénieur logiciel', initials: 'FE' },
   'employee-nora': { name: 'Nora Benali', role: 'Responsable produit', initials: 'NB' },
+  // Compte employé utilisé pour la démonstration du parcours certification.
+  '8a2f0971': { name: 'Wissam Benboudouh', role: 'Développeur backend', initials: 'WB' },
 };
 
 // Les profils de démonstration affichés dans l'espace collaborateur. Les

@@ -2,12 +2,12 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUUID,
+  Matches,
   IsDateString,
 } from 'class-validator';
 
 export class UpdateTrainingSessionDto {
-  @IsUUID()
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   @IsOptional()
   formation_id?: string;
 

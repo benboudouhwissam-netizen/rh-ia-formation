@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   ValidateNested,
 } from 'class-validator';
 
@@ -27,7 +28,7 @@ export class ReponseQuestionDto {
 }
 
 export class SubmitQuizAttemptDto {
-  @IsUUID()
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   @ApiProperty({ example: '95df31ce-5151-4f5f-8f48-9b234c1b65d0' })
   quiz_id: string;
 

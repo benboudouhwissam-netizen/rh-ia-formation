@@ -55,8 +55,13 @@ export class CompetenceMatricesService {
     const resultats = await Promise.all(
       requises.map(async (req) => {
         const evaluations = await this.competenceMatriceRepository.query(
-          `SELECT niveau FROM employee_competences WHERE competence_id = $1`,
-          [req.competence_id],
+          `SELECT ec.niveau
+           FROM employee_competences ec
+           JOIN employee_accounts ea ON ea.id = ec.utilisateur_id
+           WHERE ec.competence_id = $1 AND ea.poste_id = $2
+             AND ea.nom_complet NOT ILIKE 'Test %'
+             AND ea.nom_complet NOT ILIKE 'Collaborateur interne'`,
+          [req.competence_id, posteId],
         );
         const niveaux = evaluations.map((e: any) => e.niveau);
         const moyenne = niveaux.length

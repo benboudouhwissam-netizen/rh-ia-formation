@@ -24,9 +24,12 @@ const COULEUR_OBSERVE = '#3E7C74';
 const COULEUR_REQUIS = '#C89B3C';
 
 const POSTE_LABELS: Record<string, string> = {
+    'aaaaaaaa': 'Développeur frontend',
     'bbbbbbbb': 'Ingénieur logiciel senior',
+    'cccccccc': 'Architecte cloud',
+    'dddddddd': 'Chef de projet formation',
     'eeeeeeee': 'Responsable RH',
-    'ffffffff': 'Chef de projet formation',
+    'ffffffff': 'DevOps',
 };
 
 function posteLabel(id: string) {
@@ -50,16 +53,16 @@ export function CompetencyGapAnalysis() {
         if (!posteId) return;
         let cancelled = false;
         setLoading(true);
-        competenceMapApi
-            .getEcartsParPoste(posteId)
-            .then((data) => {
-                if (!cancelled) setEcarts(data);
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
+        const load = () => competenceMapApi.getEcartsParPoste(posteId).then((data) => {
+            if (!cancelled) setEcarts(data);
+        }).finally(() => {
+            if (!cancelled) setLoading(false);
+        });
+        load();
+        const timer = window.setInterval(load, 15000);
         return () => {
             cancelled = true;
+            window.clearInterval(timer);
         };
     }, [posteId]);
 

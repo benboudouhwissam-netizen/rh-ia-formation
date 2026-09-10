@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterEmployeeDto {
@@ -22,4 +22,9 @@ export class RegisterEmployeeDto {
   @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   @ApiProperty({ example: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', description: 'UUID du poste' })
   poste_id: string;
+
+  @IsOptional()
+  @IsIn(['CDI', 'CDD'])
+  @ApiProperty({ enum: ['CDI', 'CDD'], required: false, example: 'CDI' })
+  type_contrat?: 'CDI' | 'CDD';
 }

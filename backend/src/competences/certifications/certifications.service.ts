@@ -145,7 +145,7 @@ export class CertificationsService {
   }
 
   async findByUtilisateur(utilisateurId: string) {
-    return this.certificationRepository.find({
+    const certifications = await this.certificationRepository.find({
       where: {
         utilisateur_id: utilisateurId,
       },
@@ -153,6 +153,18 @@ export class CertificationsService {
         date_obtention: 'DESC',
       },
     });
+    // Ne jamais exposer deux fois le même certificat pendant la transition
+    // des anciennes données. La migration 024 empêche désormais la création
+    // de nouveaux doublons, mais cette protection reste utile pour les lignes
+    // historiques déjà présentes.
+    return Array.from(
+      new Map(
+        certifications.map((item) => [
+          `${item.competence_id}|${item.nom_certification}`,
+          item,
+        ]),
+      ).values(),
+    );
   }
 
   async generatePdf(id: string) {

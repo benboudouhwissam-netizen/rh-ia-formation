@@ -28,6 +28,7 @@ export function EmployeeAccess() {
         await register({
           nomComplet: String(form.get('name')), email: String(form.get('email')),
           password: String(form.get('password')), posteId: String(form.get('poste')),
+          typeContrat: String(form.get('type_contrat')) as 'CDI' | 'CDD',
         });
       }
     } catch (reason) {
@@ -45,7 +46,10 @@ export function EmployeeAccess() {
           {mode === 'register' && <label className="block font-body text-sm font-medium text-encre">Nom complet<input required name="name" className="mt-1 w-full rounded-lg border border-ardoise/20 px-3 py-2" /></label>}
           <label className="block font-body text-sm font-medium text-encre">E-mail professionnel<input required name="email" type="email" className="mt-1 w-full rounded-lg border border-ardoise/20 px-3 py-2" /></label>
           <label className="block font-body text-sm font-medium text-encre">Mot de passe<input required name="password" type="password" minLength={8} className="mt-1 w-full rounded-lg border border-ardoise/20 px-3 py-2" /></label>
-          {mode === 'register' && <label className="block font-body text-sm font-medium text-encre">Poste<select name="poste" defaultValue={DEFAULT_POSTE_ID} className="mt-1 w-full rounded-lg border border-ardoise/20 bg-white px-3 py-2"><option value={DEFAULT_POSTE_ID}>Chef de projet formation</option><option value="eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee">Développeur backend</option><option value="ffffffff-ffff-ffff-ffff-ffffffffffff">DevOps</option></select></label>}
+          {mode === 'register' && <>
+            <label className="block font-body text-sm font-medium text-encre">Poste<select name="poste" defaultValue={DEFAULT_POSTE_ID} className="mt-1 w-full rounded-lg border border-ardoise/20 bg-white px-3 py-2"><option value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa">Développeur frontend</option><option value={DEFAULT_POSTE_ID}>Ingénieur logiciel senior</option><option value="cccccccc-cccc-cccc-cccc-cccccccccccc">Architecte cloud</option><option value="dddddddd-dddd-dddd-dddd-dddddddddddd">Chef de projet formation</option><option value="eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee">Responsable RH</option><option value="ffffffff-ffff-ffff-ffff-ffffffffffff">DevOps</option></select></label>
+            <label className="block font-body text-sm font-medium text-encre">Type de contrat<select required name="type_contrat" defaultValue="CDI" className="mt-1 w-full rounded-lg border border-ardoise/20 bg-white px-3 py-2"><option value="CDI">CDI</option><option value="CDD">CDD</option></select></label>
+          </>}
           {error && <p role="alert" className="rounded-lg bg-alerte-50 p-3 font-body text-sm text-alerte">{error}</p>}
           <button disabled={loading} className="w-full rounded-lg bg-sauge px-4 py-3 font-body font-semibold text-white disabled:opacity-50">{loading ? 'Chargement…' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}</button>
         </form>

@@ -8,12 +8,14 @@ import { UpdateEmployeeProfileDto } from './dto/update-employee-profile.dto';
 import { EmployeeAccount } from './entities/employee-account.entity';
 import { EmployeeAuthSession } from './entities/employee-auth-session.entity';
 import { PerformanceEventsService } from '../formations/performance-events/performance-events.service';
+import { Contract } from '../lot3/entities/contract.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(EmployeeAccount) private readonly employees: Repository<EmployeeAccount>,
     @InjectRepository(EmployeeAuthSession) private readonly sessions: Repository<EmployeeAuthSession>,
+    @InjectRepository(Contract) private readonly contracts: Repository<Contract>,
     private readonly performanceEventsService: PerformanceEventsService,
   ) {}
 
@@ -25,7 +27,16 @@ export class AuthService {
     const employee = await this.employees.save(this.employees.create({
       nom_complet: dto.nom_complet.trim(), email_professionnel: email,
       password_hash: this.hashPassword(dto.mot_de_passe), poste_id: dto.poste_id,
+      type_contrat: dto.type_contrat ?? null,
     }));
+    if (dto.type_contrat) {
+      await this.contracts.save(this.contracts.create({
+        employee_id: employee.id,
+        type: dto.type_contrat,
+        status: 'actif',
+        start_date: new Date().toISOString().slice(0, 10),
+      }));
+    }
     return this.createSession(employee);
   }
 

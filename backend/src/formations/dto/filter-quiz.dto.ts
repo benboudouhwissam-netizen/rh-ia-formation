@@ -2,7 +2,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUUID,
+  Matches,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -45,7 +45,10 @@ export class FilterQuizDto {
   offset?: number;
 
   @IsOptional()
-  @IsUUID()
+  // Les formations historiques utilisent des UUID PostgreSQL valides mais
+  // certains ne correspondent pas à une version UUID v4. La base reste la
+  // source de validation de l’existence de la formation.
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   formation_id?: string;
 
   @IsOptional()

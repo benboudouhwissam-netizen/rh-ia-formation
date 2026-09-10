@@ -1,9 +1,9 @@
 import { Type } from 'class-transformer';
 import {
   IsInt,
+  Matches,
   IsOptional,
   IsString,
-  IsUUID,
   Min,
 } from 'class-validator';
 
@@ -32,7 +32,7 @@ export class CreateFormationDtoExample {
 }
 
 export class FilterQuizQuestionDto {
-  @IsUUID()
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   @IsOptional()
   quiz_id?: string;
 

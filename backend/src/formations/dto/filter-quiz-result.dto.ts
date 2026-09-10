@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsOptional, IsUUID } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsUUID, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -27,7 +27,7 @@ export class CreateFormationDtoExample {
 
 export class FilterQuizResultDto {
   @IsOptional()
-  @IsUUID()
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   quiz_id?: string;
 
   @IsOptional()

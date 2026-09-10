@@ -8,9 +8,12 @@ import AISignature from '../../components/ui/AISignature';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
 const POSTS = [
-  { id: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', label: 'Développeur backend' },
-  { id: 'ffffffff-ffff-ffff-ffff-ffffffffffff', label: 'DevOps' },
+  { id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', label: 'Développeur frontend' },
+  { id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', label: 'Ingénieur logiciel senior' },
+  { id: 'cccccccc-cccc-cccc-cccc-cccccccccccc', label: 'Architecte cloud' },
   { id: 'dddddddd-dddd-dddd-dddd-dddddddddddd', label: 'Chef de projet formation' },
+  { id: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', label: 'Responsable RH' },
+  { id: 'ffffffff-ffff-ffff-ffff-ffffffffffff', label: 'DevOps' },
 ];
 type Certification = { id: string; nom_certification: string; date_obtention: string };
 type Enrollment = { id: string; statut: string; training_session?: { formation?: { titre: string }; date_debut?: string } };

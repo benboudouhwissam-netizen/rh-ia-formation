@@ -29,7 +29,7 @@ export type EmployeeProfile = {
 type AuthContextValue = {
   employee: EmployeeProfile | null;
   ready: boolean;
-  register: (input: { nomComplet: string; email: string; password: string; posteId: string }) => Promise<void>;
+  register: (input: { nomComplet: string; email: string; password: string; posteId: string; typeContrat: 'CDI' | 'CDD' }) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (input: Partial<EmployeeProfile>) => Promise<void>;
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ready,
     register: async (input) => saveSession(await request('/auth/register', {
       nom_complet: input.nomComplet, email_professionnel: input.email,
-      mot_de_passe: input.password, poste_id: input.posteId,
+      mot_de_passe: input.password, poste_id: input.posteId, type_contrat: input.typeContrat,
     })),
     login: async (email, password) => saveSession(await request('/auth/login', {
       email_professionnel: email, mot_de_passe: password,

@@ -20,7 +20,14 @@ export function MyFormations({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     if (!employee) return;
     fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=50`).then((r) => r.json()).then((data) => setEnrollments(data.data ?? [])).catch(() => setEnrollments([]));
-    fetch(`${API_URL}/certifications/utilisateur/${employee.id}`).then((r) => r.json()).then((data) => setCertifications(data.data ?? data ?? [])).catch(() => setCertifications([]));
+      fetch(`${API_URL}/certifications/utilisateur/${employee.id}`).then((r) => r.json()).then((data) => {
+        const items: Certification[] = data.data ?? data ?? [];
+        // Compatibilité avec d'anciennes données éventuellement dupliquées.
+        // L'API est désormais protégée par une contrainte unique, mais cette
+        // déduplication évite d'afficher deux cartes pendant la migration.
+        const unique = Array.from(new Map(items.map((item) => [`${item.nom_certification}|${item.date_obtention}`, item])).values());
+        setCertifications(unique);
+      }).catch(() => setCertifications([]));
   }, [employee]);
   const completed = certifications.length;
   const total = enrollments.length + certifications.length;

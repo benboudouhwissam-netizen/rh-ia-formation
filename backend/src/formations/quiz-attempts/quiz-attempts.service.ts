@@ -193,20 +193,34 @@ export class QuizAttemptsService {
     const links = await this.formationCompetenceRepository.find({ where: { formation_id: formationId } });
     let created = 0;
     const dateObtention = new Date().toISOString().slice(0, 10);
+    let certificationForFormation: Certification | null = null;
 
     for (const link of links) {
       const nomCertification = `Validation — ${quizTitle}`;
-      const existing = await this.certificationRepository.findOne({
-        where: { utilisateur_id: utilisateurId, competence_id: link.competence_id, nom_certification: nomCertification },
+      const existing = certificationForFormation ?? await this.certificationRepository.findOne({
+        where: { utilisateur_id: utilisateurId, nom_certification: nomCertification },
       });
-      const certification = existing ?? await this.certificationRepository.save(this.certificationRepository.create({
-          utilisateur_id: utilisateurId,
-          competence_id: link.competence_id,
-          nom_certification: nomCertification,
-          organisme: 'RH Manager',
-          date_obtention: dateObtention,
-          date_expiration: null,
-        }));
+      // L'index unique de la migration 024 et l'upsert rendent cette
+      // opération idempotente : deux soumissions simultanées du même quiz
+      // ne peuvent plus créer deux certificats identiques.
+      if (!existing) {
+        await this.certificationRepository.upsert(
+          {
+            utilisateur_id: utilisateurId,
+            competence_id: link.competence_id,
+            nom_certification: nomCertification,
+            organisme: 'RH Manager',
+            date_obtention: dateObtention,
+            date_expiration: null,
+          },
+          ['utilisateur_id', 'nom_certification'],
+        );
+      }
+      const certification = existing ?? await this.certificationRepository.findOne({
+        where: { utilisateur_id: utilisateurId, nom_certification: nomCertification },
+      });
+      if (!certification) continue;
+      certificationForFormation = certification;
       const certificateLink = await this.linkCertificationFormationRepository.findOne({
         where: { certification_id: certification.id, formation_id: formationId },
       });
@@ -218,7 +232,7 @@ export class QuizAttemptsService {
           }),
         );
       }
-      if (!existing) {
+      if (!existing && created === 0) {
         created++;
       }
     }

@@ -169,8 +169,11 @@ export function NotificationCenter() {
          * ---------------------------------------------------------
          */
 
+        const uniqueCertifications = Array.from(
+          new Map(certifications.map((item) => [`${item.nom_certification}|${item.date_obtention}`, item])).values(),
+        );
         const certificateNotices: Notice[] =
-          certifications.map((item) => ({
+          uniqueCertifications.map((item) => ({
             id: `certificate-${item.id}`,
 
             message: `Certificat reçu : ${item.nom_certification}.`,

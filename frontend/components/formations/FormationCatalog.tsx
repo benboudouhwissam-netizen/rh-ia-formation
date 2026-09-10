@@ -57,7 +57,7 @@ export function FormationCatalog({ onSelect, searchQuery = '' }: { onSelect: (fo
   const [categorie, setCategorie] = useState('');
   const [niveau, setNiveau] = useState('');
   const [page, setPage] = useState(1);
-  const pageSize = 3;
+  const pageSize = 6;
 
   useEffect(() => {
     setSearch(searchQuery);

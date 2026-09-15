@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { enrollmentsApi, formationsApi, trainingSessionsApi, Formation, TrainingSession } from '../../lib/api';
 import { useAuth } from '../auth/AuthProvider';
@@ -18,9 +18,12 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
   const [loading, setLoading] = useState(true);
   const [inscriptionStatut, setInscriptionStatut] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [sessionDate, setSessionDate] = useState('');
+  const [sessionLieu, setSessionLieu] = useState('');
+  const [sessionCapacite, setSessionCapacite] = useState('');
   const [sessionCreationStatut, setSessionCreationStatut] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const { employee } = useAuth();
   const router = useRouter();
+  const selectedSession = sessions.find((session) => session.id === selectedSessionId);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,19 +66,21 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
   async function handleCreateSession(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!sessionDate) return;
-
     setSessionCreationStatut('loading');
     try {
-      const dateDebut = new Date(`${sessionDate}T09:00:00`).toISOString();
       const created = await trainingSessionsApi.create({
         formation_id: formationId,
-        date_debut: dateDebut,
+        date_debut: new Date(`${sessionDate}T09:00:00`).toISOString(),
+        lieu: sessionLieu || undefined,
+        capacite: sessionCapacite ? Number(sessionCapacite) : undefined,
         statut: 'planifiee',
       });
       const refreshed = await trainingSessionsApi.listByFormation(formationId);
       setSessions(refreshed.data ?? []);
       setSelectedSessionId(created.id);
       setSessionDate('');
+      setSessionLieu('');
+      setSessionCapacite('');
       setSessionCreationStatut('success');
     } catch {
       setSessionCreationStatut('error');
@@ -87,6 +92,8 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
     setInscriptionStatut('loading');
     try {
       await formationsApi.inscrire(selectedSessionId, utilisateurId, { nomComplet: employee.nom_complet, emailProfessionnel: employee.email_professionnel });
+      const refreshed = await trainingSessionsApi.listByFormation(formationId);
+      setSessions(refreshed.data ?? []);
       setInscriptionStatut('success');
       window.dispatchEvent(new Event('rh-notifications-refresh'));
     } catch {
@@ -126,8 +133,8 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
           <p className="font-body text-encre">{formation.duree ? `${formation.duree} min` : '—'}</p>
         </div>
         <div className="col-span-4 rounded-lg border border-ardoise/12 bg-white p-4">
-          <p className="font-mono text-xs text-ardoise mb-1">Statut</p>
-          <p className="font-body text-encre">{formation.statut ?? '—'}</p>
+          <p className="font-mono text-xs text-ardoise mb-1">Modalité</p>
+          <p className="font-body text-encre">{formation.modalite === 'presentiel' ? 'Présentiel' : 'E-learning'}</p>
         </div>
       </section>
 
@@ -135,7 +142,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
         <h2 className="font-heading text-sm uppercase tracking-wide text-ardoise mb-2">
           Sessions programmées
         </h2>
-        <form onSubmit={handleCreateSession} className="mb-4 rounded-lg border border-ardoise/12 bg-white p-4">
+        {formation.modalite !== 'presentiel' && <form onSubmit={handleCreateSession} className="mb-4 rounded-lg border border-ardoise/12 bg-white p-4">
           <div className="flex flex-wrap items-end gap-3">
             <label className="flex min-w-[220px] flex-1 flex-col gap-1 font-body text-sm text-encre">
               <span className="font-semibold">Choisir la date d&apos;une session</span>
@@ -147,6 +154,14 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
                 required
                 className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20"
               />
+            </label>
+            <label className="flex min-w-[180px] flex-1 flex-col gap-1 font-body text-sm text-encre">
+              <span className="font-semibold">Salle</span>
+              <input value={sessionLieu} onChange={(event) => setSessionLieu(event.target.value)} placeholder="Salle Atlas" className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20" />
+            </label>
+            <label className="flex w-36 flex-col gap-1 font-body text-sm text-encre">
+              <span className="font-semibold">Places</span>
+              <input type="number" min="1" value={sessionCapacite} onChange={(event) => setSessionCapacite(event.target.value)} placeholder="20" className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20" />
             </label>
             <button
               type="submit"
@@ -162,7 +177,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
           {sessionCreationStatut === 'error' && (
             <p className="mt-2 font-body text-sm text-alerte" role="alert">Impossible de programmer cette session. Réessayez.</p>
           )}
-        </form>
+        </form>}
         {sessions.length === 0 ? (
           <p className="font-body text-sm text-ardoise">Aucune session programmée pour le moment.</p>
         ) : (
@@ -198,6 +213,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
                       year: 'numeric',
                     })}
                   </p>
+                  <p className="mt-1 font-body text-xs text-ardoise">{session.lieu ?? 'Salle à confirmer'} · {session.places_restantes == null ? 'Places non limitées' : `${session.places_restantes} place${session.places_restantes > 1 ? 's' : ''} restante${session.places_restantes > 1 ? 's' : ''}`}</p>
                   </div>
                 </label>
               </li>
@@ -208,20 +224,20 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
 
       <button
         onClick={handleInscription}
-        disabled={!selectedSessionId || !employee || alreadyEnrolled || inscriptionStatut === 'loading' || inscriptionStatut === 'success'}
+        disabled={!selectedSessionId || selectedSession?.places_restantes === 0 || !employee || alreadyEnrolled || inscriptionStatut === 'loading' || inscriptionStatut === 'success'}
         className="font-body rounded-lg bg-sauge px-6 py-3 text-white font-semibold transition hover:opacity-90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-encre"
       >
         {alreadyEnrolled || inscriptionStatut === 'success' ? 'Déjà inscrit à cette session' : "S'inscrire à la session sélectionnée"}
       </button>
 
-      <button
+      {formation.modalite !== 'presentiel' && <button
         type="button"
         onClick={() => router.push(`/formations/${formationId}`)}
         disabled={!alreadyEnrolled && inscriptionStatut !== 'success'}
         className="mt-4 block rounded-lg border border-sauge px-6 py-3 font-body font-semibold text-sauge transition hover:bg-sauge/10 focus-visible:ring-2 focus-visible:ring-sauge disabled:cursor-not-allowed disabled:border-ardoise/25 disabled:text-ardoise/60"
       >
         {alreadyEnrolled || inscriptionStatut === 'success' ? 'Commencer le parcours e-learning' : 'Inscrivez-vous pour accéder au e-learning'}
-      </button>
+      </button>}
 
       {alreadyEnrolled && <p className="mt-2 font-body text-sm text-sauge" role="status">Votre inscription à cette session est déjà confirmée.</p>}
       {inscriptionStatut === 'success' && !alreadyEnrolled && <p className="mt-2 font-body text-sm text-sauge" role="status">Inscription confirmée. Cette formation est maintenant disponible dans « Mes formations ».</p>}

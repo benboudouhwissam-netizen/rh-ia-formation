@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { EnrollmentsService } from './enrollments.service';
 import { Enrollment } from '../entities/enrollment.entity';
+import { TrainingSession } from '../entities/training-session.entity';
 import { LearningTasksService } from '../learning-tasks/learning-tasks.service';
 import { PerformanceEventsService } from '../performance-events/performance-events.service';
 
@@ -22,12 +23,14 @@ describe('EnrollmentsService', () => {
   const repositoryMock = {
     createQueryBuilder: jest.fn(),
     findOne: jest.fn(),
+    count: jest.fn().mockResolvedValue(0),
     create: jest.fn(),
     save: jest.fn(),
     remove: jest.fn(),
   };
   const learningTasksMock = { create: jest.fn() };
   const performanceEventsMock = { publish: jest.fn() };
+  const trainingSessionMock = { findOne: jest.fn().mockResolvedValue({ id: 'session-1', capacite: null }) };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -38,6 +41,10 @@ describe('EnrollmentsService', () => {
         {
           provide: getRepositoryToken(Enrollment),
           useValue: repositoryMock,
+        },
+        {
+          provide: getRepositoryToken(TrainingSession),
+          useValue: trainingSessionMock,
         },
         { provide: LearningTasksService, useValue: learningTasksMock },
         { provide: PerformanceEventsService, useValue: performanceEventsMock },

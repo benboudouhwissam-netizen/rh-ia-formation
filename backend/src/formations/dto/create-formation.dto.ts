@@ -29,6 +29,11 @@ export class CreateFormationDto {
   niveau?: string;
 
   @IsOptional()
+  @ApiPropertyOptional({ example: 'presentiel', enum: ['presentiel', 'e_learning'] })
+  @IsString()
+  modalite?: string;
+
+  @IsOptional()
   @ApiPropertyOptional({ example: 100, description: 'Durée en minutes' })
   @IsInt()
   duree?: number;

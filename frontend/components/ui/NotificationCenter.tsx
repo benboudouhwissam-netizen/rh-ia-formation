@@ -148,10 +148,11 @@ export function NotificationCenter() {
         const sessionNotices: Notice[] = (
           enrollmentsResponseData.data ?? []
         )
-          .filter(
-            (item) =>
-              item.training_session?.date_debut,
-          )
+          .filter((item) => {
+            if (!item.training_session?.date_debut) return false;
+            const daysUntil = (new Date(item.training_session.date_debut).getTime() - Date.now()) / 86_400_000;
+            return daysUntil >= 0 && daysUntil <= 7;
+          })
           .map((item) => ({
             id: `session-${item.id}`,
             message: `Session prévue le ${new Date(

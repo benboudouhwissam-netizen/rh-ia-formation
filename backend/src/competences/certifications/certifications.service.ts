@@ -157,7 +157,7 @@ export class CertificationsService {
     // des anciennes données. La migration 024 empêche désormais la création
     // de nouveaux doublons, mais cette protection reste utile pour les lignes
     // historiques déjà présentes.
-    return Array.from(
+    const unique = Array.from(
       new Map(
         certifications.map((item) => [
           `${item.competence_id}|${item.nom_certification}`,
@@ -165,6 +165,12 @@ export class CertificationsService {
         ]),
       ).values(),
     );
+    return Promise.all(unique.map(async (item) => {
+      const link = await this.linkCertificationFormationRepository.findOne({
+        where: { certification_id: item.id },
+      });
+      return { ...item, formation_id: link?.formation_id ?? null };
+    }));
   }
 
   async generatePdf(id: string) {

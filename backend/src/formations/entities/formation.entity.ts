@@ -32,6 +32,9 @@ export class Formation {
   })
   niveau: string;
 
+  @Column({ length: 30, default: 'e_learning' })
+  modalite: string;
+
   @Column({
     type: 'integer',
     nullable: true,

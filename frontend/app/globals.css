@@ -63,13 +63,14 @@
 
   /* ========================================
      TYPOGRAPHIE
-     Les variables sont fournies par next/font
-     dans layout.tsx.
+     Polices du design system RH IA.
+     Les noms sont conservés avec des replis système pour
+     garantir un rendu lisible si les polices ne sont pas installées.
      ======================================== */
 
-  --font-heading: "Trebuchet MS", "Segoe UI", sans-serif;
-  --font-body: "Segoe UI", Arial, sans-serif;
-  --font-mono: Consolas, "Courier New", monospace;
+  --font-heading: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
 
   /* Tailles */
   --text-h1: 2.5rem;

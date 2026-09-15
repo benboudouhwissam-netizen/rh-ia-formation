@@ -24,6 +24,10 @@ export class UpdateFormationDto {
   @IsOptional()
   niveau?: string;
 
+  @IsString()
+  @IsOptional()
+  modalite?: string;
+
   @IsInt()
   @IsOptional()
   duree?: number;

@@ -33,7 +33,7 @@ export default function ELearningPage() {
           return;
         }
         setFormation(formationResult.value);
-        if (quizResult.status === 'fulfilled') setQuizzes(quizResult.value.data ?? []);
+        if (formationResult.value.modalite !== 'presentiel' && quizResult.status === 'fulfilled') setQuizzes(quizResult.value.data ?? []);
         else setQuizzes([]);
       })
       .finally(() => setLoading(false));
@@ -79,7 +79,8 @@ export default function ELearningPage() {
     <main className="mx-auto w-full max-w-[1440px]">
       {loading && <p className="py-16 text-center font-body text-ardoise">Chargement du module…</p>}
       {!loading && error && <p role="alert" className="rounded-lg border border-red-200 bg-white p-6 font-body text-red-700">{error}</p>}
-      {!loading && formation && currentChapter && <>
+      {!loading && formation?.modalite === 'presentiel' && <section className="mx-auto max-w-2xl rounded-xl border border-sauge/20 bg-white p-8 text-center shadow-sm"><p className="font-mono text-xs uppercase tracking-[0.16em] text-sauge-700">Formation présentielle</p><h1 className="mt-3 font-heading text-3xl font-bold text-encre">{formation.titre}</h1><p className="mt-3 font-body text-ardoise">Cette formation se déroule en salle. Aucun parcours e-learning ni quiz en ligne n’est disponible.</p><button type="button" onClick={() => router.push('/')} className="mt-6 rounded-lg bg-sauge px-5 py-2.5 font-body font-semibold text-white">Retour au catalogue</button></section>}
+      {!loading && formation && formation.modalite !== 'presentiel' && currentChapter && <>
         <nav className="mb-6 flex flex-wrap items-center gap-2 font-mono text-xs text-ardoise"><button onClick={() => router.push('/')} className="hover:text-sauge">Formations</button><span>›</span><span>{formation.categorie ?? 'Parcours'}</span><span>›</span><strong className="text-encre">{currentChapter.title}</strong></nav>
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_380px]">
           <section className="space-y-6">

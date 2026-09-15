@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { TrainingSessionsService } from './training-sessions.service';
 import { TrainingSession } from '../entities/training-session.entity';
+import { Enrollment } from '../entities/enrollment.entity';
 
 describe('TrainingSessionsService', () => {
   let service: TrainingSessionsService;
@@ -18,6 +19,7 @@ describe('TrainingSessionsService', () => {
     delete: jest.fn(),
     remove: jest.fn(),
     createQueryBuilder: jest.fn(),
+    count: jest.fn().mockResolvedValue(0),
   };
 
   beforeEach(async () => {
@@ -28,6 +30,10 @@ describe('TrainingSessionsService', () => {
           {
             provide: getRepositoryToken(TrainingSession),
             useValue: mockRepository,
+          },
+          {
+            provide: getRepositoryToken(Enrollment),
+            useValue: { count: jest.fn().mockResolvedValue(0) },
           },
         ],
       }).compile();

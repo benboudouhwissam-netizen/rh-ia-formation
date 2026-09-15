@@ -52,6 +52,8 @@ export class TrainingSession {
   })
   capacite: number;
 
+  places_restantes?: number | null;
+
   @Column({
     length: 50,
     nullable: true,

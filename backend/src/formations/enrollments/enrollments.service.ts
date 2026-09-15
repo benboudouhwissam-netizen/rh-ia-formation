@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Enrollment } from '../entities/enrollment.entity';
+import { TrainingSession } from '../entities/training-session.entity';
 
 import { CreateEnrollmentDto } from '../dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from '../dto/update-enrollment.dto';
@@ -20,6 +21,8 @@ export class EnrollmentsService {
   constructor(
     @InjectRepository(Enrollment)
     private readonly enrollmentRepository: Repository<Enrollment>,
+    @InjectRepository(TrainingSession)
+    private readonly trainingSessionRepository: Repository<TrainingSession>,
     private readonly learningTasksService: LearningTasksService,
     private readonly performanceEventsService: PerformanceEventsService,
   ) {}
@@ -116,6 +119,21 @@ export class EnrollmentsService {
       throw new ConflictException(
         'Employee is already enrolled in this training session',
       );
+    }
+
+    const session = await this.trainingSessionRepository.findOne({
+      where: { id: createDto.training_session_id },
+    });
+    if (!session) {
+      throw new NotFoundException('Training session not found');
+    }
+    if (session.capacite != null) {
+      const inscrits = await this.enrollmentRepository.count({
+        where: { training_session_id: session.id },
+      });
+      if (inscrits >= session.capacite) {
+        throw new ConflictException('Cette session est complète');
+      }
     }
 
     const enrollment =

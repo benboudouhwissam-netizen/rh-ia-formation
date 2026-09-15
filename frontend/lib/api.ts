@@ -8,6 +8,7 @@ export interface Formation {
   niveau: string | null;
   duree: number | null;
   statut: string | null;
+  modalite: 'presentiel' | 'e_learning' | string | null;
   created_at: string;
 }
 
@@ -75,6 +76,7 @@ export interface TrainingSession {
   lieu: string | null;
   capacite: number | null;
   statut: string | null;
+  places_restantes?: number | null;
 }
 
 export interface Enrollment {

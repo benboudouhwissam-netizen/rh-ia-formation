@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { TrainingSession } from '../entities/training-session.entity';
+import { Enrollment } from '../entities/enrollment.entity';
 
 import { CreateTrainingSessionDto } from '../dto/create-training-session.dto';
 import { UpdateTrainingSessionDto } from '../dto/update-training-session.dto';
@@ -16,7 +17,24 @@ export class TrainingSessionsService {
   constructor(
     @InjectRepository(TrainingSession)
     private readonly trainingSessionRepository: Repository<TrainingSession>,
+    @InjectRepository(Enrollment)
+    private readonly enrollmentRepository: Repository<Enrollment>,
   ) {}
+
+  private async withRemainingPlaces(sessions: TrainingSession[], enumerable = true) {
+    return Promise.all(sessions.map(async (session) => {
+      const inscrits = await this.enrollmentRepository.count({
+        where: { training_session_id: session.id },
+      });
+      Object.defineProperty(session, 'places_restantes', {
+        value: session.capacite == null ? null : Math.max(0, session.capacite - inscrits),
+        enumerable,
+        configurable: true,
+        writable: true,
+      });
+      return session;
+    }));
+  }
 
   async findAll(filterDto: FilterTrainingSessionDto) {
     const limit = filterDto.limit ?? 10;
@@ -53,7 +71,7 @@ export class TrainingSessionsService {
       await queryBuilder.getManyAndCount();
 
     return {
-      data,
+      data: await this.withRemainingPlaces(data, true),
       total,
       limit,
       offset,
@@ -75,7 +93,7 @@ export class TrainingSessionsService {
       );
     }
 
-    return trainingSession;
+    return (await this.withRemainingPlaces([trainingSession], false))[0];
   }
 
   async create(

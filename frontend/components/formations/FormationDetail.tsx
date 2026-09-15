@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { enrollmentsApi, formationsApi, trainingSessionsApi, Formation, TrainingSession } from '../../lib/api';
 import { useAuth } from '../auth/AuthProvider';
@@ -17,6 +17,8 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
   const [alreadyEnrolled, setAlreadyEnrolled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [inscriptionStatut, setInscriptionStatut] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [sessionDate, setSessionDate] = useState('');
+  const [sessionCreationStatut, setSessionCreationStatut] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const { employee } = useAuth();
   const router = useRouter();
 
@@ -39,7 +41,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
     trainingSessionsApi
       .listByFormation(formationId)
       .then((data) => {
-        if (!cancelled) setSessions((data.data ?? []).slice(0, 2));
+        if (!cancelled) setSessions(data.data ?? []);
         if (!cancelled) setSelectedSessionId(data.data[0]?.id ?? null);
         if (!cancelled && data.data[0]?.id) {
           enrollmentsApi.listForSession(data.data[0].id, utilisateurId)
@@ -57,6 +59,28 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
       cancelled = true;
     };
   }, [formationId]);
+
+  async function handleCreateSession(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!sessionDate) return;
+
+    setSessionCreationStatut('loading');
+    try {
+      const dateDebut = new Date(`${sessionDate}T09:00:00`).toISOString();
+      const created = await trainingSessionsApi.create({
+        formation_id: formationId,
+        date_debut: dateDebut,
+        statut: 'planifiee',
+      });
+      const refreshed = await trainingSessionsApi.listByFormation(formationId);
+      setSessions(refreshed.data ?? []);
+      setSelectedSessionId(created.id);
+      setSessionDate('');
+      setSessionCreationStatut('success');
+    } catch {
+      setSessionCreationStatut('error');
+    }
+  }
 
   async function handleInscription() {
     if (!selectedSessionId || !employee) return;
@@ -111,6 +135,34 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
         <h2 className="font-heading text-sm uppercase tracking-wide text-ardoise mb-2">
           Sessions programmées
         </h2>
+        <form onSubmit={handleCreateSession} className="mb-4 rounded-lg border border-ardoise/12 bg-white p-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="flex min-w-[220px] flex-1 flex-col gap-1 font-body text-sm text-encre">
+              <span className="font-semibold">Choisir la date d&apos;une session</span>
+              <input
+                type="date"
+                value={sessionDate}
+                min={new Date().toISOString().slice(0, 10)}
+                onChange={(event) => setSessionDate(event.target.value)}
+                required
+                className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={!sessionDate || sessionCreationStatut === 'loading'}
+              className="rounded-lg bg-sauge px-5 py-2.5 font-body font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+            >
+              {sessionCreationStatut === 'loading' ? 'Enregistrement…' : 'Programmer la session'}
+            </button>
+          </div>
+          {sessionCreationStatut === 'success' && (
+            <p className="mt-2 font-body text-sm text-sauge" role="status">Session programmée à la date choisie.</p>
+          )}
+          {sessionCreationStatut === 'error' && (
+            <p className="mt-2 font-body text-sm text-alerte" role="alert">Impossible de programmer cette session. Réessayez.</p>
+          )}
+        </form>
         {sessions.length === 0 ? (
           <p className="font-body text-sm text-ardoise">Aucune session programmée pour le moment.</p>
         ) : (

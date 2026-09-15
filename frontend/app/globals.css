@@ -67,9 +67,9 @@
      dans layout.tsx.
      ======================================== */
 
-  --font-heading: var(--font-rh-heading), sans-serif;
-  --font-body: var(--font-rh-body), sans-serif;
-  --font-mono: var(--font-rh-mono), monospace;
+  --font-heading: "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-body: "Segoe UI", Arial, sans-serif;
+  --font-mono: Consolas, "Courier New", monospace;
 
   /* Tailles */
   --text-h1: 2.5rem;

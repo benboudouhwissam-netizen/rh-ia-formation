@@ -57,6 +57,16 @@ async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   return res.json();
 }
 
+async function apiPut<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`Erreur API ${res.status} sur ${path}`);
+  return res.json();
+}
+
 export interface TrainingSession {
   id: string;
   formation_id: string;
@@ -87,6 +97,16 @@ export const trainingSessionsApi = {
       formation_id: formationId,
       limit: 20,
     }),
+  create: (session: {
+    formation_id: string;
+    date_debut: string;
+    date_fin?: string;
+    lieu?: string;
+    capacite?: number;
+    statut?: string;
+  }) => apiPost<TrainingSession>('/training-sessions', session),
+  update: (sessionId: string, session: Partial<TrainingSession>) =>
+    apiPut<TrainingSession>(`/training-sessions/${sessionId}`, session),
 };
 
   export interface MatrixData {
@@ -190,7 +210,8 @@ export const quizApi = {
 };
 
 export const formationsApi = {
-  list: (filters: FormationFilters) => apiGet<Formation[]>('/formations', filters as any),
+  list: (filters: FormationFilters) =>
+    apiGet<Formation[]>('/formations', filters as Record<string, string | number | undefined>),
   getById: (id: string) => apiGet<Formation>(`/formations/${id}`),
   inscrire: (trainingSessionId: string, utilisateurId: string, details: { nomComplet: string; emailProfessionnel: string }) =>
     apiPost('/enrollments', {

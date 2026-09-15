@@ -1,10 +1,4 @@
 import type { Metadata } from "next";
-import {
-  Space_Grotesk,
-  IBM_Plex_Sans,
-  IBM_Plex_Mono,
-} from "next/font/google";
-
 import "./globals.css";
 import { AuthProvider } from '../components/auth/AuthProvider';
 
@@ -12,27 +6,6 @@ import { AuthProvider } from '../components/auth/AuthProvider';
    TYPOGRAPHIE — DESIGN SYSTEM RH IA
    Lot 11
    ======================================== */
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-rh-heading",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
-});
-
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-rh-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-rh-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
 
 /* ========================================
    METADATA
@@ -56,13 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`
-        ${spaceGrotesk.variable}
-        ${ibmPlexSans.variable}
-        ${ibmPlexMono.variable}
-        h-full
-        antialiased
-      `}
+      className="h-full antialiased"
     >
       {/* AJOUTER ICI */}
       <head>

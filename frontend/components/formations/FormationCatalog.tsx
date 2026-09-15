@@ -1,5 +1,8 @@
 'use client';
 
+/* The catalogue uses remote decorative images with an onError fallback. */
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useMemo, useState } from 'react';
 import { formationsApi, Formation, FormationFilters } from '../../lib/api';
 

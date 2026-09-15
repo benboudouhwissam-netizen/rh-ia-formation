@@ -1,3 +1,5 @@
+/* API responses are intentionally untyped in this black-box integration test. */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { test, expect } from '@playwright/test';
 
 const API_URL = 'http://localhost:3000/api';

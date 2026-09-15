@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+/* Profile avatars may be data URLs selected locally by the user. */
+/* eslint-disable @next/next/no-img-element */
+import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../components/auth/AuthProvider';
 import { AppShell } from '../../components/ui/AppShell';
 import AISignature from '../../components/ui/AISignature';
@@ -60,10 +62,10 @@ export default function ProfilPage() {
   const [diplomaForm, setDiplomaForm] = useState({ title: '', institution: '', field: '', year: '' });
   const [documentForm, setDocumentForm] = useState({ category: 'autre', title: '', storage_key: '', mime_type: '' });
 
-  const fillForm = () => {
+  const fillForm = useCallback(() => {
     if (!employee) return;
     setForm({ nom_complet: employee.nom_complet, email_professionnel: employee.email_professionnel, poste_id: employee.poste_id, avatar_url: employee.avatar_url ?? '', matricule: employee.matricule ?? '', first_name: employee.first_name ?? '', last_name: employee.last_name ?? '', phone: employee.phone ?? '', birth_date: employee.birth_date ?? '', address: employee.address ?? '', city: employee.city ?? '', postal_code: employee.postal_code ?? '', country: employee.country ?? '', hire_date: employee.hire_date ?? '', status: employee.status ?? 'actif', job_title: employee.job_title ?? '' });
-  };
+  }, [employee]);
   useEffect(() => {
     if (!employee) return;
     fillForm();
@@ -74,7 +76,7 @@ export default function ProfilPage() {
       fetch(`${API_URL}/lot3/diplomas?employee_id=${employee.id}`).then((res) => res.ok ? res.json() : []),
       fetch(`${API_URL}/lot3/documents?employee_id=${employee.id}`).then((res) => res.ok ? res.json() : []),
     ]).then(([certs, enrollmentResult, contractResult, diplomaResult, documentResult]) => { setCertifications(certs); setEnrollments(enrollmentResult.data ?? []); setContracts(contractResult); setDiplomas(diplomaResult); setDocuments(documentResult); }).catch(() => {});
-  }, [employee]);
+  }, [employee, fillForm]);
   useEffect(() => {
     const refresh = () => window.location.reload();
     window.addEventListener('lot3-updated', refresh);
@@ -120,6 +122,8 @@ export default function ProfilPage() {
   };
 
   if (!ready || !employee) return <main className="grid min-h-screen place-items-center bg-brume font-body text-ardoise">Chargement du profil…</main>;
+  void lot3Saving;
+  void createLot3;
   const avatar = editing ? form.avatar_url : employee.avatar_url;
   const displayedName = editing ? form.nom_complet : employee.nom_complet;
 

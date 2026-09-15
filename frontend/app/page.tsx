@@ -6,10 +6,8 @@ import { FormationCatalog } from '../components/formations/FormationCatalog';
 import { FormationDetail } from '../components/formations/FormationDetail';
 import { RecommendedTrainings } from '../components/formations/RecommendedTrainings';
 import { AppShell } from '../components/ui/AppShell';
-import { EmployeeAccess } from '../components/auth/EmployeeAccess';
 import { useAuth } from '../components/auth/AuthProvider';
 import { MyFormations } from '../components/formations/MyFormations';
-import Spinner from '../components/ui/Spinner';
 
 export default function Home() {
   const [formationSelectionnee, setFormationSelectionnee] = useState<string | null>(null);

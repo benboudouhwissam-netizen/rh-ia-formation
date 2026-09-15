@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { competenceMapApi, CompetenceExpert } from '../../lib/api';
-import { employeePresentation, isCuratedEmployee } from '../../lib/employee-presentation';
+import { employeePresentation } from '../../lib/employee-presentation';
 
 import Card from '../ui/Card';
 import Spinner from '../ui/Spinner';

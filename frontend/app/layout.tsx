@@ -33,6 +33,8 @@ export default function RootLayout({
     >
       {/* AJOUTER ICI */}
       <head>
+        {/* Icon styles are intentionally loaded from CDN; next/font is not used. */}
+        {/* eslint-disable-next-line @next/next/google-font-display, @next/next/no-page-custom-font */}
         <link 
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" 
           rel="stylesheet" 

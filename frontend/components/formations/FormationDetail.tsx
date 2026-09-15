@@ -58,7 +58,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
     return () => {
       cancelled = true;
     };
-  }, [formationId]);
+  }, [formationId, utilisateurId]);
 
   async function handleCreateSession(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

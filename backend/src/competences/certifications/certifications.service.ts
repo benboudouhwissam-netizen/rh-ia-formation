@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import PDFDocument from 'pdfkit';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -41,12 +45,7 @@ export class CertificationsService {
   ) {}
 
   async findAll(filterDto: FilterCertificationDto) {
-    const {
-      utilisateur_id,
-      competence_id,
-      limit = 10,
-      offset = 0,
-    } = filterDto;
+    const { utilisateur_id, competence_id, limit = 10, offset = 0 } = filterDto;
 
     const where: any = {};
 
@@ -58,15 +57,14 @@ export class CertificationsService {
       where.competence_id = competence_id;
     }
 
-    const [data, total] =
-      await this.certificationRepository.findAndCount({
-        where,
-        order: {
-          date_obtention: 'DESC',
-        },
-        take: limit,
-        skip: offset,
-      });
+    const [data, total] = await this.certificationRepository.findAndCount({
+      where,
+      order: {
+        date_obtention: 'DESC',
+      },
+      take: limit,
+      skip: offset,
+    });
 
     return {
       data,
@@ -77,17 +75,14 @@ export class CertificationsService {
   }
 
   async findOne(id: string) {
-    const certification =
-      await this.certificationRepository.findOne({
-        where: {
-          id,
-        },
-      });
+    const certification = await this.certificationRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
     if (!certification) {
-      throw new NotFoundException(
-        `Certification avec l'id ${id} introuvable`,
-      );
+      throw new NotFoundException(`Certification avec l'id ${id} introuvable`);
     }
 
     const link = await this.linkCertificationFormationRepository.findOne({
@@ -100,30 +95,44 @@ export class CertificationsService {
       order: { date_passage: 'DESC' },
       take: 20,
     });
-    const certificateQuizResult = passedResults.find((result) =>
-      certification.nom_certification.includes(result.quiz?.titre ?? ''),
-    ) ?? null;
-    const formationCompetence = link || certificateQuizResult
-      ? null
-      : await this.formationCompetenceRepository.findOne({
-          where: { competence_id: certification.competence_id },
-        });
-    const formation = link?.formation
-      ?? (certificateQuizResult?.quiz
-        ? await this.formationRepository.findOne({ where: { id: certificateQuizResult.quiz.formation_id } })
-        : null)
-      ?? (formationCompetence
-        ? await this.formationRepository.findOne({ where: { id: formationCompetence.formation_id } })
+    const certificateQuizResult =
+      passedResults.find((result) =>
+        certification.nom_certification.includes(result.quiz?.titre ?? ''),
+      ) ?? null;
+    const formationCompetence =
+      link || certificateQuizResult
+        ? null
+        : await this.formationCompetenceRepository.findOne({
+            where: { competence_id: certification.competence_id },
+          });
+    const formation =
+      link?.formation ??
+      (certificateQuizResult?.quiz
+        ? await this.formationRepository.findOne({
+            where: { id: certificateQuizResult.quiz.formation_id },
+          })
+        : null) ??
+      (formationCompetence
+        ? await this.formationRepository.findOne({
+            where: { id: formationCompetence.formation_id },
+          })
         : null);
     const quiz = formation
-      ? await this.quizRepository.findOne({ where: { formation_id: formation.id } })
-      : null;
-    const resultatQuiz = certificateQuizResult ?? (quiz
-      ? await this.quizResultRepository.findOne({
-          where: { quiz_id: quiz.id, utilisateur_id: certification.utilisateur_id },
-          order: { date_passage: 'DESC' },
+      ? await this.quizRepository.findOne({
+          where: { formation_id: formation.id },
         })
-      : null);
+      : null;
+    const resultatQuiz =
+      certificateQuizResult ??
+      (quiz
+        ? await this.quizResultRepository.findOne({
+            where: {
+              quiz_id: quiz.id,
+              utilisateur_id: certification.utilisateur_id,
+            },
+            order: { date_passage: 'DESC' },
+          })
+        : null);
 
     const recommandations = await this.formationRepository.find({
       where: { statut: 'active' },
@@ -140,7 +149,9 @@ export class CertificationsService {
         date_passage: resultatQuiz?.date_passage ?? null,
         progression: resultatQuiz?.reussi ? 100 : null,
       },
-      recommandations: recommandations.filter((item) => item.id !== formation?.id).slice(0, 3),
+      recommandations: recommandations
+        .filter((item) => item.id !== formation?.id)
+        .slice(0, 3),
     };
   }
 
@@ -165,12 +176,14 @@ export class CertificationsService {
         ]),
       ).values(),
     );
-    return Promise.all(unique.map(async (item) => {
-      const link = await this.linkCertificationFormationRepository.findOne({
-        where: { certification_id: item.id },
-      });
-      return { ...item, formation_id: link?.formation_id ?? null };
-    }));
+    return Promise.all(
+      unique.map(async (item) => {
+        const link = await this.linkCertificationFormationRepository.findOne({
+          where: { certification_id: item.id },
+        });
+        return { ...item, formation_id: link?.formation_id ?? null };
+      }),
+    );
   }
 
   async generatePdf(id: string) {
@@ -178,14 +191,25 @@ export class CertificationsService {
     const score = certification.statistiques.score_quiz;
     const required = certification.statistiques.score_requis;
     if (score === null || (required !== null && score < required)) {
-      throw new ForbiddenException('Le quiz n’est pas réussi : certificat indisponible.');
+      throw new ForbiddenException(
+        'Le quiz n’est pas réussi : certificat indisponible.',
+      );
     }
-    const title = certification.formation?.titre ?? certification.nom_certification;
+    const title =
+      certification.formation?.titre ?? certification.nom_certification;
     const date = certification.date_obtention;
-    const employee = await this.employeeRepository.findOne({ where: { id: certification.utilisateur_id } });
+    const employee = await this.employeeRepository.findOne({
+      where: { id: certification.utilisateur_id },
+    });
     const employeeName = employee?.nom_complet ?? 'Employé RH IA';
-    const duration = certification.formation?.duree ? `${certification.formation.duree} min` : 'Non renseignée';
-    const pdf = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 48 });
+    const duration = certification.formation?.duree
+      ? `${certification.formation.duree} min`
+      : 'Non renseignée';
+    const pdf = new PDFDocument({
+      size: 'A4',
+      layout: 'landscape',
+      margin: 48,
+    });
     const chunks: Buffer[] = [];
     const buffer = new Promise<Buffer>((resolve, reject) => {
       pdf.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
@@ -196,18 +220,65 @@ export class CertificationsService {
     pdf.roundedRect(35, 35, 772, 525, 10).fill('#ffffff').stroke('#3e7c74');
     pdf.roundedRect(40, 40, 762, 515, 8).stroke('#3e7c74');
     pdf.roundedRect(385, 75, 72, 72, 8).fill('#1c2b39');
-    pdf.fontSize(16).fillColor('#ffffff').text('RH', 385, 104, { width: 72, align: 'center' });
-    pdf.fontSize(13).fillColor('#3e7c74').text('C E R T I F I C A T   D E   R É U S S I T E', 0, 185, { width: 842, align: 'center' });
+    pdf
+      .fontSize(16)
+      .fillColor('#ffffff')
+      .text('RH', 385, 104, { width: 72, align: 'center' });
+    pdf
+      .fontSize(13)
+      .fillColor('#3e7c74')
+      .text('C E R T I F I C A T   D E   R É U S S I T E', 0, 185, {
+        width: 842,
+        align: 'center',
+      });
     pdf.moveTo(350, 215).lineTo(492, 215).stroke('#c89b3c');
-    pdf.fontSize(13).fillColor('#657681').text('Ce certificat est décerné à', 0, 260, { width: 842, align: 'center' });
-    pdf.fontSize(25).fillColor('#1c2b39').text(employeeName, 0, 290, { width: 842, align: 'center' });
-    pdf.fontSize(13).fillColor('#657681').text('pour avoir validé avec succès la formation', 0, 345, { width: 842, align: 'center' });
-    pdf.fontSize(18).fillColor('#1c2b39').text(title, 0, 375, { width: 842, align: 'center' });
-    pdf.fontSize(11).fillColor('#657681').text(`Date d’obtention : ${date}    •    Durée : ${duration}    •    Score : ${score}%`, 0, 425, { width: 842, align: 'center' });
+    pdf
+      .fontSize(13)
+      .fillColor('#657681')
+      .text('Ce certificat est décerné à', 0, 260, {
+        width: 842,
+        align: 'center',
+      });
+    pdf
+      .fontSize(25)
+      .fillColor('#1c2b39')
+      .text(employeeName, 0, 290, { width: 842, align: 'center' });
+    pdf
+      .fontSize(13)
+      .fillColor('#657681')
+      .text('pour avoir validé avec succès la formation', 0, 345, {
+        width: 842,
+        align: 'center',
+      });
+    pdf
+      .fontSize(18)
+      .fillColor('#1c2b39')
+      .text(title, 0, 375, { width: 842, align: 'center' });
+    pdf
+      .fontSize(11)
+      .fillColor('#657681')
+      .text(
+        `Date d’obtention : ${date}    •    Durée : ${duration}    •    Score : ${score}%`,
+        0,
+        425,
+        { width: 842, align: 'center' },
+      );
     pdf.moveTo(300, 475).lineTo(542, 475).stroke('#d8e3e1');
-    pdf.fontSize(10).fillColor('#657681').text(`Identifiant : RH-IA-${id.slice(0, 8).toUpperCase()}`, 0, 495, { width: 842, align: 'center' });
-    pdf.fontSize(11).fillColor('#657681').text('Signature autorisée', 600, 495, { width: 130, align: 'center' });
-    pdf.fontSize(14).fillColor('#1c2b39').text('RH IA', 600, 515, { width: 130, align: 'center' });
+    pdf
+      .fontSize(10)
+      .fillColor('#657681')
+      .text(`Identifiant : RH-IA-${id.slice(0, 8).toUpperCase()}`, 0, 495, {
+        width: 842,
+        align: 'center',
+      });
+    pdf
+      .fontSize(11)
+      .fillColor('#657681')
+      .text('Signature autorisée', 600, 495, { width: 130, align: 'center' });
+    pdf
+      .fontSize(14)
+      .fillColor('#1c2b39')
+      .text('RH IA', 600, 515, { width: 130, align: 'center' });
     pdf.end();
     const content = await buffer;
     const objectKey = `certificate-${id}.pdf`;
@@ -216,31 +287,23 @@ export class CertificationsService {
   }
 
   async create(createDto: CreateCertificationDto) {
-    const certification =
-      this.certificationRepository.create(createDto);
+    const certification = this.certificationRepository.create(createDto);
 
     return this.certificationRepository.save(certification);
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateCertificationDto,
-  ) {
+  async update(id: string, updateDto: UpdateCertificationDto) {
     const certification = await this.findOne(id);
 
     Object.assign(certification, updateDto);
 
-    return this.certificationRepository.save(
-      certification,
-    );
+    return this.certificationRepository.save(certification);
   }
 
   async remove(id: string) {
     const certification = await this.findOne(id);
 
-    await this.certificationRepository.remove(
-      certification,
-    );
+    await this.certificationRepository.remove(certification);
 
     return {
       message: 'Certification deleted successfully',

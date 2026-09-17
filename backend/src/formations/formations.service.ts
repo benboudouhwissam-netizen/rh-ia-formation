@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -31,9 +28,7 @@ export class FormationsService {
     private readonly aiService: AiService,
   ) {}
 
-  async findAll(
-    filterDto: FilterFormationDto,
-  ): Promise<Formation[]> {
+  async findAll(filterDto: FilterFormationDto): Promise<Formation[]> {
     const where: any = {};
 
     if (filterDto.categorie) {
@@ -46,6 +41,10 @@ export class FormationsService {
 
     if (filterDto.statut) {
       where.statut = filterDto.statut;
+    }
+
+    if (filterDto.modalite) {
+      where.modalite = filterDto.modalite;
     }
 
     return this.formationRepository.find({
@@ -64,20 +63,14 @@ export class FormationsService {
     });
 
     if (!formation) {
-      throw new NotFoundException(
-        `Formation avec l'id ${id} introuvable`,
-      );
+      throw new NotFoundException(`Formation avec l'id ${id} introuvable`);
     }
 
     return formation;
   }
 
-  async create(
-    createFormationDto: CreateFormationDto,
-  ): Promise<Formation> {
-    const formation = this.formationRepository.create(
-      createFormationDto,
-    );
+  async create(createFormationDto: CreateFormationDto): Promise<Formation> {
+    const formation = this.formationRepository.create(createFormationDto);
 
     return this.formationRepository.save(formation);
   }
@@ -206,7 +199,10 @@ export class FormationsService {
     return formations;
   }
 
-  async generateMissingEmbeddings(): Promise<{ traitees: number; formations: string[] }> {
+  async generateMissingEmbeddings(): Promise<{
+    traitees: number;
+    formations: string[];
+  }> {
     const sansEmbedding = await this.formationRepository
       .createQueryBuilder('formation')
       .where('formation.embedding IS NULL')

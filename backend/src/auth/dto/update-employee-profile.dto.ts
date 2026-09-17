@@ -1,4 +1,10 @@
-import { IsEmail, IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateEmployeeProfileDto {
@@ -26,7 +32,10 @@ export class UpdateEmployeeProfileDto {
   type_contrat?: 'CDI' | 'CDD';
 
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Photo encodée en Data URL', example: 'data:image/jpeg;base64,...' })
+  @ApiPropertyOptional({
+    description: 'Photo encodée en Data URL',
+    example: 'data:image/jpeg;base64,...',
+  })
   @IsString()
   @MaxLength(3_000_000)
   avatar_url?: string;

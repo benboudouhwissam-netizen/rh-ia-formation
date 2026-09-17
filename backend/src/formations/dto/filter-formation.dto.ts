@@ -1,10 +1,6 @@
-import {
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FilterFormationDto {
   @IsOptional()
@@ -30,4 +26,12 @@ export class FilterFormationDto {
   @IsOptional()
   @IsString()
   statut?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: 'Modalité de formation',
+    enum: ['presentiel', 'e_learning'],
+  })
+  modalite?: string;
 }

@@ -33,7 +33,10 @@ export class CreateQuizDto {
 
   @IsOptional()
   @IsInt()
-  @ApiPropertyOptional({ example: 70, description: 'Score minimal requis (en pourcentage)' })
+  @ApiPropertyOptional({
+    example: 70,
+    description: 'Score minimal requis (en pourcentage)',
+  })
   score_requis?: number;
 
   @IsOptional()

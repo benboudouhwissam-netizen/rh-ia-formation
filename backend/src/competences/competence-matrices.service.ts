@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,9 +12,7 @@ export class CompetenceMatricesService {
     private readonly competenceMatriceRepository: Repository<CompetenceMatrice>,
   ) {}
 
-  async findByPoste(
-    posteId: string,
-  ): Promise<CompetenceMatrice[]> {
+  async findByPoste(posteId: string): Promise<CompetenceMatrice[]> {
     return this.competenceMatriceRepository.find({
       where: {
         poste_id: posteId,
@@ -29,13 +24,12 @@ export class CompetenceMatricesService {
   }
 
   async findOne(id: string): Promise<CompetenceMatrice> {
-    const matrice =
-      await this.competenceMatriceRepository.findOne({
-        where: { id },
-        relations: {
-          competence: true,
-        },
-      });
+    const matrice = await this.competenceMatriceRepository.findOne({
+      where: { id },
+      relations: {
+        competence: true,
+      },
+    });
 
     if (!matrice) {
       throw new NotFoundException(
@@ -67,7 +61,9 @@ export class CompetenceMatricesService {
         const moyenne = niveaux.length
           ? niveaux.reduce((a: number, b: number) => a + b, 0) / niveaux.length
           : 0;
-        const enEcart = niveaux.filter((n: number) => n < req.niveau_requis).length;
+        const enEcart = niveaux.filter(
+          (n: number) => n < req.niveau_requis,
+        ).length;
 
         return {
           competence_id: req.competence_id,

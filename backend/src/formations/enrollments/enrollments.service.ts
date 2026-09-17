@@ -33,50 +33,36 @@ export class EnrollmentsService {
 
     const queryBuilder = this.enrollmentRepository
       .createQueryBuilder('enrollment')
-      .leftJoinAndSelect(
-        'enrollment.training_session',
-        'training_session',
-      )
+      .leftJoinAndSelect('enrollment.training_session', 'training_session')
       .leftJoinAndSelect('training_session.formation', 'formation');
 
     if (filterDto.utilisateur_id) {
-      queryBuilder.andWhere(
-        'enrollment.utilisateur_id = :utilisateur_id',
-        {
-          utilisateur_id: filterDto.utilisateur_id,
-        },
-      );
+      queryBuilder.andWhere('enrollment.utilisateur_id = :utilisateur_id', {
+        utilisateur_id: filterDto.utilisateur_id,
+      });
     }
 
     if (filterDto.training_session_id) {
       queryBuilder.andWhere(
         'enrollment.training_session_id = :training_session_id',
         {
-          training_session_id:
-            filterDto.training_session_id,
+          training_session_id: filterDto.training_session_id,
         },
       );
     }
 
     if (filterDto.statut) {
-      queryBuilder.andWhere(
-        'enrollment.statut = :statut',
-        {
-          statut: filterDto.statut,
-        },
-      );
+      queryBuilder.andWhere('enrollment.statut = :statut', {
+        statut: filterDto.statut,
+      });
     }
 
     queryBuilder
       .skip(offset)
       .take(limit)
-      .orderBy(
-        'enrollment.date_inscription',
-        'DESC',
-      );
+      .orderBy('enrollment.date_inscription', 'DESC');
 
-    const [data, total] =
-      await queryBuilder.getManyAndCount();
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     return {
       data,
@@ -87,33 +73,27 @@ export class EnrollmentsService {
   }
 
   async findOne(id: string) {
-    const enrollment =
-      await this.enrollmentRepository.findOne({
-        where: { id },
-        relations: {
-          training_session: true,
-        },
-      });
+    const enrollment = await this.enrollmentRepository.findOne({
+      where: { id },
+      relations: {
+        training_session: true,
+      },
+    });
 
     if (!enrollment) {
-      throw new NotFoundException(
-        `Enrollment with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Enrollment with ID ${id} not found`);
     }
 
     return enrollment;
   }
 
   async create(createDto: CreateEnrollmentDto) {
-    const existing =
-      await this.enrollmentRepository.findOne({
-        where: {
-          utilisateur_id:
-            createDto.utilisateur_id,
-          training_session_id:
-            createDto.training_session_id,
-        },
-      });
+    const existing = await this.enrollmentRepository.findOne({
+      where: {
+        utilisateur_id: createDto.utilisateur_id,
+        training_session_id: createDto.training_session_id,
+      },
+    });
 
     if (existing) {
       throw new ConflictException(
@@ -136,24 +116,20 @@ export class EnrollmentsService {
       }
     }
 
-    const enrollment =
-      this.enrollmentRepository.create({
-        utilisateur_id:
-          createDto.utilisateur_id,
+    const enrollment = this.enrollmentRepository.create({
+      utilisateur_id: createDto.utilisateur_id,
 
-        training_session_id:
-          createDto.training_session_id,
+      training_session_id: createDto.training_session_id,
 
-        date_inscription:
-          new Date(createDto.date_inscription),
+      date_inscription: new Date(createDto.date_inscription),
 
-        statut:
-          createDto.statut ?? 'inscrit',
+      statut: createDto.statut ?? 'inscrit',
 
-        nom_complet: createDto.nom_complet?.trim() || null,
+      nom_complet: createDto.nom_complet?.trim() || null,
 
-        email_professionnel: createDto.email_professionnel?.trim().toLowerCase() || null,
-      });
+      email_professionnel:
+        createDto.email_professionnel?.trim().toLowerCase() || null,
+    });
 
     const saved = await this.enrollmentRepository.save(enrollment);
     await this.learningTasksService.create({
@@ -172,33 +148,23 @@ export class EnrollmentsService {
     return saved;
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateEnrollmentDto,
-  ) {
-    const enrollment =
-      await this.findOne(id);
+  async update(id: string, updateDto: UpdateEnrollmentDto) {
+    const enrollment = await this.findOne(id);
 
     Object.assign(enrollment, {
       ...updateDto,
       ...(updateDto.date_inscription && {
-        date_inscription:
-          new Date(updateDto.date_inscription),
+        date_inscription: new Date(updateDto.date_inscription),
       }),
     });
 
-    return this.enrollmentRepository.save(
-      enrollment,
-    );
+    return this.enrollmentRepository.save(enrollment);
   }
 
   async remove(id: string) {
-    const enrollment =
-      await this.findOne(id);
+    const enrollment = await this.findOne(id);
 
-    await this.enrollmentRepository.remove(
-      enrollment,
-    );
+    await this.enrollmentRepository.remove(enrollment);
 
     return {
       message: 'Enrollment deleted successfully',

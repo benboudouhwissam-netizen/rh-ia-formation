@@ -19,12 +19,7 @@ export class QuizQuestionsService {
   ) {}
 
   async findAll(filterDto: FilterQuizQuestionDto) {
-    const {
-      quiz_id,
-      type,
-      limit = 10,
-      offset = 0,
-    } = filterDto;
+    const { quiz_id, type, limit = 10, offset = 0 } = filterDto;
 
     const where: any = {};
 
@@ -36,18 +31,17 @@ export class QuizQuestionsService {
       where.type = type;
     }
 
-    const [data, total] =
-      await this.quizQuestionRepository.findAndCount({
-        where,
-        relations: {
-            quiz: true,
-        },
-        order: {
-          ordre: 'ASC',
-        },
-        take: limit,
-        skip: offset,
-      });
+    const [data, total] = await this.quizQuestionRepository.findAndCount({
+      where,
+      relations: {
+        quiz: true,
+      },
+      order: {
+        ordre: 'ASC',
+      },
+      take: limit,
+      skip: offset,
+    });
 
     return {
       data,
@@ -58,18 +52,15 @@ export class QuizQuestionsService {
   }
 
   async findOne(id: string) {
-    const question =
-      await this.quizQuestionRepository.findOne({
-        where: { id },
-        relations: {
-          quiz: true,
-        },
-      });
+    const question = await this.quizQuestionRepository.findOne({
+      where: { id },
+      relations: {
+        quiz: true,
+      },
+    });
 
     if (!question) {
-      throw new NotFoundException(
-        `Quiz question with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Quiz question with ID ${id} not found`);
     }
 
     return question;
@@ -77,8 +68,7 @@ export class QuizQuestionsService {
 
   async create(createDto: CreateQuizQuestionDto) {
     try {
-      const question =
-        this.quizQuestionRepository.create(createDto);
+      const question = this.quizQuestionRepository.create(createDto);
 
       return await this.quizQuestionRepository.save(question);
     } catch (error) {
@@ -86,10 +76,7 @@ export class QuizQuestionsService {
     }
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateQuizQuestionDto,
-  ) {
+  async update(id: string, updateDto: UpdateQuizQuestionDto) {
     const question = await this.findOne(id);
 
     Object.assign(question, updateDto);

@@ -34,20 +34,17 @@ describe('QuizQuestionsController', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    const module: TestingModule =
-      await Test.createTestingModule({
-        controllers: [QuizQuestionsController],
-        providers: [
-          {
-            provide: QuizQuestionsService,
-            useValue: service,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [QuizQuestionsController],
+      providers: [
+        {
+          provide: QuizQuestionsService,
+          useValue: service,
+        },
+      ],
+    }).compile();
 
-    controller = module.get<QuizQuestionsController>(
-      QuizQuestionsController,
-    );
+    controller = module.get<QuizQuestionsController>(QuizQuestionsController);
   });
 
   it('should be defined', () => {
@@ -93,9 +90,7 @@ describe('QuizQuestionsController', () => {
       expect(result.limit).toBe(3);
       expect(result.offset).toBe(6);
 
-      expect(service.findAll).toHaveBeenCalledWith(
-        filter,
-      );
+      expect(service.findAll).toHaveBeenCalledWith(filter);
     });
 
     it('GET /api/quiz-questions?quiz_id=quiz-1 - should filter by quiz_id', async () => {
@@ -112,9 +107,7 @@ describe('QuizQuestionsController', () => {
 
       await controller.findAll(filter);
 
-      expect(service.findAll).toHaveBeenCalledWith(
-        filter,
-      );
+      expect(service.findAll).toHaveBeenCalledWith(filter);
     });
 
     it('GET /api/quiz-questions?type=multiple_choice - should filter by type', async () => {
@@ -131,9 +124,7 @@ describe('QuizQuestionsController', () => {
 
       await controller.findAll(filter);
 
-      expect(service.findAll).toHaveBeenCalledWith(
-        filter,
-      );
+      expect(service.findAll).toHaveBeenCalledWith(filter);
     });
 
     it('GET /api/quiz-questions - should apply multiple filters', async () => {
@@ -153,19 +144,13 @@ describe('QuizQuestionsController', () => {
 
       await controller.findAll(filter);
 
-      expect(service.findAll).toHaveBeenCalledWith(
-        filter,
-      );
+      expect(service.findAll).toHaveBeenCalledWith(filter);
     });
 
     it('GET /api/quiz-questions - should propagate service errors', async () => {
-      service.findAll.mockRejectedValue(
-        new Error('Database error'),
-      );
+      service.findAll.mockRejectedValue(new Error('Database error'));
 
-      await expect(
-        controller.findAll({}),
-      ).rejects.toThrow('Database error');
+      await expect(controller.findAll({})).rejects.toThrow('Database error');
     });
   });
 
@@ -181,13 +166,9 @@ describe('QuizQuestionsController', () => {
     });
 
     it('GET /api/quiz-questions/:id - should propagate service errors', async () => {
-      service.findOne.mockRejectedValue(
-        new Error('Quiz question not found'),
-      );
+      service.findOne.mockRejectedValue(new Error('Quiz question not found'));
 
-      await expect(
-        controller.findOne('999'),
-      ).rejects.toThrow(
+      await expect(controller.findOne('999')).rejects.toThrow(
         'Quiz question not found',
       );
     });
@@ -207,25 +188,17 @@ describe('QuizQuestionsController', () => {
         ...createDto,
       };
 
-      service.create.mockResolvedValue(
-        createdQuestion,
-      );
+      service.create.mockResolvedValue(createdQuestion);
 
-      const result = await controller.create(
-        createDto,
-      );
+      const result = await controller.create(createDto);
 
       expect(result).toEqual(createdQuestion);
 
-      expect(service.create).toHaveBeenCalledWith(
-        createDto,
-      );
+      expect(service.create).toHaveBeenCalledWith(createDto);
     });
 
     it('POST /api/quiz-questions - should propagate service errors', async () => {
-      service.create.mockRejectedValue(
-        new Error('Database error'),
-      );
+      service.create.mockRejectedValue(new Error('Database error'));
 
       await expect(
         controller.create({
@@ -251,35 +224,23 @@ describe('QuizQuestionsController', () => {
         ...updateDto,
       };
 
-      service.update.mockResolvedValue(
-        updatedQuestion,
-      );
+      service.update.mockResolvedValue(updatedQuestion);
 
-      const result = await controller.update(
-        '1',
-        updateDto,
-      );
+      const result = await controller.update('1', updateDto);
 
       expect(result).toEqual(updatedQuestion);
 
-      expect(service.update).toHaveBeenCalledWith(
-        '1',
-        updateDto,
-      );
+      expect(service.update).toHaveBeenCalledWith('1', updateDto);
     });
 
     it('PUT /api/quiz-questions/:id - should propagate service errors', async () => {
-      service.update.mockRejectedValue(
-        new Error('Quiz question not found'),
-      );
+      service.update.mockRejectedValue(new Error('Quiz question not found'));
 
       await expect(
         controller.update('999', {
           question: 'Question modifiée ?',
         }),
-      ).rejects.toThrow(
-        'Quiz question not found',
-      );
+      ).rejects.toThrow('Quiz question not found');
     });
   });
 
@@ -299,13 +260,9 @@ describe('QuizQuestionsController', () => {
     });
 
     it('DELETE /api/quiz-questions/:id - should propagate service errors', async () => {
-      service.remove.mockRejectedValue(
-        new Error('Quiz question not found'),
-      );
+      service.remove.mockRejectedValue(new Error('Quiz question not found'));
 
-      await expect(
-        controller.remove('999'),
-      ).rejects.toThrow(
+      await expect(controller.remove('999')).rejects.toThrow(
         'Quiz question not found',
       );
     });

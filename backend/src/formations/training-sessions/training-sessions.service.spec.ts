@@ -23,29 +23,25 @@ describe('TrainingSessionsService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        providers: [
-          TrainingSessionsService,
-          {
-            provide: getRepositoryToken(TrainingSession),
-            useValue: mockRepository,
-          },
-          {
-            provide: getRepositoryToken(Enrollment),
-            useValue: { count: jest.fn().mockResolvedValue(0) },
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        TrainingSessionsService,
+        {
+          provide: getRepositoryToken(TrainingSession),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Enrollment),
+          useValue: { count: jest.fn().mockResolvedValue(0) },
+        },
+      ],
+    }).compile();
 
-    service = module.get<TrainingSessionsService>(
-      TrainingSessionsService,
+    service = module.get<TrainingSessionsService>(TrainingSessionsService);
+
+    repository = module.get<jest.Mocked<Repository<TrainingSession>>>(
+      getRepositoryToken(TrainingSession),
     );
-
-    repository =
-      module.get<jest.Mocked<Repository<TrainingSession>>>(
-        getRepositoryToken(TrainingSession),
-      );
 
     jest.clearAllMocks();
   });
@@ -71,9 +67,7 @@ describe('TrainingSessionsService', () => {
         },
       ] as TrainingSession[];
 
-      const getManyAndCount = jest
-        .fn()
-        .mockResolvedValue([sessions, 2]);
+      const getManyAndCount = jest.fn().mockResolvedValue([sessions, 2]);
 
       const orderBy = jest.fn().mockReturnThis();
       const take = jest.fn().mockReturnThis();
@@ -88,9 +82,7 @@ describe('TrainingSessionsService', () => {
         getManyAndCount,
       };
 
-      repository.createQueryBuilder.mockReturnValue(
-        queryBuilder as any,
-      );
+      repository.createQueryBuilder.mockReturnValue(queryBuilder as any);
 
       const result = await service.findAll({});
 
@@ -101,9 +93,7 @@ describe('TrainingSessionsService', () => {
         offset: 0,
       });
 
-      expect(repository.createQueryBuilder).toHaveBeenCalledWith(
-        'session',
-      );
+      expect(repository.createQueryBuilder).toHaveBeenCalledWith('session');
 
       expect(getManyAndCount).toHaveBeenCalledTimes(1);
     });
@@ -116,9 +106,7 @@ describe('TrainingSessionsService', () => {
         },
       ] as TrainingSession[];
 
-      const getManyAndCount = jest
-        .fn()
-        .mockResolvedValue([sessions, 10]);
+      const getManyAndCount = jest.fn().mockResolvedValue([sessions, 10]);
 
       const queryBuilder = {
         leftJoinAndSelect: jest.fn().mockReturnThis(),
@@ -129,9 +117,7 @@ describe('TrainingSessionsService', () => {
         getManyAndCount,
       };
 
-      repository.createQueryBuilder.mockReturnValue(
-        queryBuilder as any,
-      );
+      repository.createQueryBuilder.mockReturnValue(queryBuilder as any);
 
       const result = await service.findAll({
         limit: 3,
@@ -146,9 +132,7 @@ describe('TrainingSessionsService', () => {
     });
 
     it('should filter by formation_id', async () => {
-      const getManyAndCount = jest
-        .fn()
-        .mockResolvedValue([[], 0]);
+      const getManyAndCount = jest.fn().mockResolvedValue([[], 0]);
 
       const queryBuilder = {
         leftJoinAndSelect: jest.fn().mockReturnThis(),
@@ -159,9 +143,7 @@ describe('TrainingSessionsService', () => {
         getManyAndCount,
       };
 
-      repository.createQueryBuilder.mockReturnValue(
-        queryBuilder as any,
-      );
+      repository.createQueryBuilder.mockReturnValue(queryBuilder as any);
 
       await service.findAll({
         formation_id: 'formation-123',
@@ -176,9 +158,7 @@ describe('TrainingSessionsService', () => {
     });
 
     it('should filter by statut', async () => {
-      const getManyAndCount = jest
-        .fn()
-        .mockResolvedValue([[], 0]);
+      const getManyAndCount = jest.fn().mockResolvedValue([[], 0]);
 
       const queryBuilder = {
         leftJoinAndSelect: jest.fn().mockReturnThis(),
@@ -189,9 +169,7 @@ describe('TrainingSessionsService', () => {
         getManyAndCount,
       };
 
-      repository.createQueryBuilder.mockReturnValue(
-        queryBuilder as any,
-      );
+      repository.createQueryBuilder.mockReturnValue(queryBuilder as any);
 
       await service.findAll({
         statut: 'active',
@@ -206,9 +184,7 @@ describe('TrainingSessionsService', () => {
     });
 
     it('should apply multiple filters', async () => {
-      const getManyAndCount = jest
-        .fn()
-        .mockResolvedValue([[], 0]);
+      const getManyAndCount = jest.fn().mockResolvedValue([[], 0]);
 
       const queryBuilder = {
         leftJoinAndSelect: jest.fn().mockReturnThis(),
@@ -219,9 +195,7 @@ describe('TrainingSessionsService', () => {
         getManyAndCount,
       };
 
-      repository.createQueryBuilder.mockReturnValue(
-        queryBuilder as any,
-      );
+      repository.createQueryBuilder.mockReturnValue(queryBuilder as any);
 
       await service.findAll({
         formation_id: 'formation-123',
@@ -273,9 +247,7 @@ describe('TrainingSessionsService', () => {
     it('should throw an error when training session does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.findOne('999'),
-      ).rejects.toThrow(
+      await expect(service.findOne('999')).rejects.toThrow(
         'Training session with ID 999 not found',
       );
     });
@@ -306,9 +278,7 @@ describe('TrainingSessionsService', () => {
       expect(result).toEqual(createdSession);
 
       expect(repository.create).toHaveBeenCalledWith(dto);
-      expect(repository.save).toHaveBeenCalledWith(
-        createdSession,
-      );
+      expect(repository.save).toHaveBeenCalledWith(createdSession);
     });
 
     it('should propagate repository errors', async () => {
@@ -318,19 +288,13 @@ describe('TrainingSessionsService', () => {
         date_debut: '2026-08-20T00:00:00.000Z',
       };
 
-      const error = new Error(
-        'Database error',
-      );
+      const error = new Error('Database error');
 
-      repository.create.mockReturnValue(
-        dto as unknown as TrainingSession,
-      );
+      repository.create.mockReturnValue(dto as unknown as TrainingSession);
 
       repository.save.mockRejectedValue(error);
 
-      await expect(
-        service.create(dto),
-      ).rejects.toThrow('Database error');
+      await expect(service.create(dto)).rejects.toThrow('Database error');
     });
   });
 
@@ -351,9 +315,7 @@ describe('TrainingSessionsService', () => {
         capacite: 30,
       };
 
-      repository.save.mockResolvedValue(
-        updatedSession as TrainingSession,
-      );
+      repository.save.mockResolvedValue(updatedSession);
 
       const result = await service.update('1', {
         lieu: 'Casablanca',
@@ -362,9 +324,7 @@ describe('TrainingSessionsService', () => {
 
       expect(result).toEqual(updatedSession);
 
-      expect(repository.save).toHaveBeenCalledWith(
-        updatedSession,
-      );
+      expect(repository.save).toHaveBeenCalledWith(updatedSession);
     });
 
     it('should throw an error when training session does not exist', async () => {
@@ -374,9 +334,7 @@ describe('TrainingSessionsService', () => {
         service.update('999', {
           lieu: 'Casablanca',
         }),
-      ).rejects.toThrow(
-        'Training session with ID 999 not found',
-      );
+      ).rejects.toThrow('Training session with ID 999 not found');
 
       expect(repository.save).not.toHaveBeenCalled();
     });
@@ -390,9 +348,7 @@ describe('TrainingSessionsService', () => {
       } as TrainingSession;
 
       repository.findOne.mockResolvedValue(session);
-      repository.remove.mockResolvedValue(
-        session,
-      );
+      repository.remove.mockResolvedValue(session);
 
       const result = await service.remove('1');
 
@@ -400,17 +356,13 @@ describe('TrainingSessionsService', () => {
         message: 'Training session deleted successfully',
       });
 
-      expect(repository.remove).toHaveBeenCalledWith(
-        session,
-      );
+      expect(repository.remove).toHaveBeenCalledWith(session);
     });
 
     it('should throw an error when training session does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.remove('999'),
-      ).rejects.toThrow(
+      await expect(service.remove('999')).rejects.toThrow(
         'Training session with ID 999 not found',
       );
 

@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -21,19 +18,27 @@ export class TrainingSessionsService {
     private readonly enrollmentRepository: Repository<Enrollment>,
   ) {}
 
-  private async withRemainingPlaces(sessions: TrainingSession[], enumerable = true) {
-    return Promise.all(sessions.map(async (session) => {
-      const inscrits = await this.enrollmentRepository.count({
-        where: { training_session_id: session.id },
-      });
-      Object.defineProperty(session, 'places_restantes', {
-        value: session.capacite == null ? null : Math.max(0, session.capacite - inscrits),
-        enumerable,
-        configurable: true,
-        writable: true,
-      });
-      return session;
-    }));
+  private async withRemainingPlaces(
+    sessions: TrainingSession[],
+    enumerable = true,
+  ) {
+    return Promise.all(
+      sessions.map(async (session) => {
+        const inscrits = await this.enrollmentRepository.count({
+          where: { training_session_id: session.id },
+        });
+        Object.defineProperty(session, 'places_restantes', {
+          value:
+            session.capacite == null
+              ? null
+              : Math.max(0, session.capacite - inscrits),
+          enumerable,
+          configurable: true,
+          writable: true,
+        });
+        return session;
+      }),
+    );
   }
 
   async findAll(filterDto: FilterTrainingSessionDto) {
@@ -45,30 +50,20 @@ export class TrainingSessionsService {
       .leftJoinAndSelect('session.formation', 'formation');
 
     if (filterDto.formation_id) {
-      queryBuilder.andWhere(
-        'session.formation_id = :formation_id',
-        {
-          formation_id: filterDto.formation_id,
-        },
-      );
+      queryBuilder.andWhere('session.formation_id = :formation_id', {
+        formation_id: filterDto.formation_id,
+      });
     }
 
     if (filterDto.statut) {
-      queryBuilder.andWhere(
-        'session.statut = :statut',
-        {
-          statut: filterDto.statut,
-        },
-      );
+      queryBuilder.andWhere('session.statut = :statut', {
+        statut: filterDto.statut,
+      });
     }
 
-    queryBuilder
-      .skip(offset)
-      .take(limit)
-      .orderBy('session.date_debut', 'DESC');
+    queryBuilder.skip(offset).take(limit).orderBy('session.date_debut', 'DESC');
 
-    const [data, total] =
-      await queryBuilder.getManyAndCount();
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     return {
       data: await this.withRemainingPlaces(data, true),
@@ -79,18 +74,15 @@ export class TrainingSessionsService {
   }
 
   async findOne(id: string) {
-    const trainingSession =
-      await this.trainingSessionRepository.findOne({
-        where: { id },
-        relations: {
-          formation: true,
-        },
-      });
+    const trainingSession = await this.trainingSessionRepository.findOne({
+      where: { id },
+      relations: {
+        formation: true,
+      },
+    });
 
     if (!trainingSession) {
-      throw new NotFoundException(
-        `Training session with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Training session with ID ${id} not found`);
     }
 
     return (await this.withRemainingPlaces([trainingSession], false))[0];
@@ -100,38 +92,28 @@ export class TrainingSessionsService {
     createTrainingSessionDto: CreateTrainingSessionDto,
   ): Promise<TrainingSession> {
     try {
-      const trainingSession =
-        this.trainingSessionRepository.create(
-          createTrainingSessionDto,
-        );
-
-      return await this.trainingSessionRepository.save(
-        trainingSession,
+      const trainingSession = this.trainingSessionRepository.create(
+        createTrainingSessionDto,
       );
+
+      return await this.trainingSessionRepository.save(trainingSession);
     } catch (error) {
       throw error;
     }
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateTrainingSessionDto,
-  ) {
+  async update(id: string, updateDto: UpdateTrainingSessionDto) {
     const trainingSession = await this.findOne(id);
 
     Object.assign(trainingSession, updateDto);
 
-    return this.trainingSessionRepository.save(
-      trainingSession,
-    );
+    return this.trainingSessionRepository.save(trainingSession);
   }
 
   async remove(id: string) {
     const trainingSession = await this.findOne(id);
 
-    await this.trainingSessionRepository.remove(
-      trainingSession,
-    );
+    await this.trainingSessionRepository.remove(trainingSession);
 
     return {
       message: 'Training session deleted successfully',

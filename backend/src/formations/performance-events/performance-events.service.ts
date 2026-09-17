@@ -10,7 +10,12 @@ export class PerformanceEventsService {
     private readonly eventRepository: Repository<PerformanceEvent>,
   ) {}
 
-  publish(input: Pick<PerformanceEvent, 'utilisateur_id' | 'type' | 'reference_id' | 'payload'>) {
+  publish(
+    input: Pick<
+      PerformanceEvent,
+      'utilisateur_id' | 'type' | 'reference_id' | 'payload'
+    >,
+  ) {
     return this.eventRepository.save(this.eventRepository.create(input));
   }
 

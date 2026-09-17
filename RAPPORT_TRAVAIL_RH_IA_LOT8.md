@@ -1,171 +1,81 @@
 # Rapport de réalisation — Plateforme RH IA
 
-## 1. Objectif du projet
+## 1. Objectif
 
-Le projet consiste à construire un parcours complet de gestion des compétences et de formation :
+La plateforme couvre le parcours : profil employé, analyse des écarts, recommandation, inscription, formation e-learning ou présentielle, évaluation et certification.
 
-> profil employé → détection des écarts → recommandation → inscription → e-learning → quiz → mise à jour des compétences → certification.
-
-Le système intègre également les événements Performance et les données du dossier employé.
-
-## 2. Architecture réalisée
+## 2. Architecture
 
 ### Backend
 
-- NestJS et TypeORM.
-- PostgreSQL pour les données métier.
-- MinIO pour le stockage des certificats PDF.
-- Swagger pour documenter les API.
-- Modules principaux : authentification, compétences, formations, quiz, inscriptions, tâches d’apprentissage, Performance, certifications et Lot 3.
+- NestJS, TypeORM et PostgreSQL ;
+- modules d’authentification, formations, sessions, inscriptions, compétences, quiz, certifications, notifications, Performance et chatbot ;
+- Swagger disponible sur `http://localhost:3000/api/docs` ;
+- stockage des certificats avec MinIO configuré par variables d’environnement.
 
 ### Frontend
 
-- Next.js avec React et TypeScript.
-- AppShell commun avec navigation, notifications, recherche et état de connexion.
-- Pages : catalogue, formation, compétences, profil, quiz, certification et support.
-- Composants réutilisables pour les cartes, boutons, spinners, recommandations et notifications.
+- Next.js, React et TypeScript ;
+- AppShell commun avec navigation, notifications, recherche et assistant RH ;
+- pages catalogue, détail formation, compétences, profil, quiz, certification et support ;
+- composants réutilisables et design system Sauge, Brume, Ocre et Encre.
 
-## 3. Base de données et migrations
+## 3. Formations et sessions
 
-Les migrations couvrent progressivement :
+- catalogue filtrable par recherche, catégorie, niveau et modalité ;
+- modalités prises en charge : `presentiel` et `e_learning` ;
+- cinq formations présentielles ajoutées avec sessions, salles, dates et capacités ;
+- affichage des places restantes ;
+- diminution des places après inscription ;
+- parcours e-learning avec chapitres, progression et quiz lorsque celui-ci est disponible ;
+- les formations présentielles ne proposent pas de parcours e-learning ni de quiz en ligne.
 
-- les compétences et matrices de compétences ;
-- les formations et associations formation-compétence ;
-- les quiz, questions, réponses et résultats ;
-- les tâches d’apprentissage ;
-- les événements Performance ;
-- les comptes employés et profils ;
-- la distribution des sessions de formation ;
-- les contrats, diplômes et documents du dossier employé Lot 3.
+## 4. Compétences et recommandations
 
-Les migrations importantes pour les dernières évolutions sont notamment `009_learning_tasks_and_quiz_profile.sql`, `010_performance_events.sql`, `019_two_sessions_per_formation.sql`, `021_session_distribution.sql`, `022_employee_lot3_profile.sql` et `023_lot3_employee_documents.sql`.
+- matrice des compétences par collaborateur et par poste ;
+- analyse des écarts et niveaux de 0 à 5 ;
+- recommandations basées sur les compétences à renforcer et la popularité ;
+- affichage des formations recommandées avec liens et images ;
+- filtres par catégorie, niveau et modalité dans le catalogue.
 
-## 4. Fonctionnalités développées
+## 5. Assistant RH conversationnel
 
-### Authentification et profil
+- assistant intégré à toutes les pages via l’AppShell ;
+- mode employé connecté : profil, certificats, matrice, graphe, recommandations personnalisées et inscription ;
+- mode visiteur : questions générales sur la plateforme, les formations, les modalités et l’inscription ;
+- recherche publique par catégorie, niveau ou modalité ;
+- recommandations populaires accessibles aux visiteurs sans exposer de données personnelles ;
+- cartes de formations avec images ;
+- orientation vers le responsable RH lorsqu’une demande ne peut pas être traitée ;
+- accès au chatbot conservé après déconnexion.
 
-- création de compte et connexion employé ;
-- consultation et modification du profil ;
-- avatar employé ;
-- conservation de l’accès à la matrice après déconnexion ;
-- bouton de connexion/déconnexion dans la barre latérale.
+## 6. Authentification et sécurité
 
-### Compétences
+- mots de passe hachés avec `scrypt` et sel aléatoire ;
+- sessions stockées sous forme de hash de token ;
+- guard de session appliqué aux inscriptions, sessions et tentatives de quiz ;
+- token transmis par le frontend aux appels API authentifiés ;
+- validation des DTO avec `ValidationPipe`, whitelist et transformation ;
+- CORS configurable par `CORS_ORIGINS` ;
+- identifiants MinIO configurables par `MINIO_ACCESS_KEY` et `MINIO_SECRET_KEY`, obligatoires en production.
 
-- matrice des compétences par collaborateur ;
-- niveaux de 0 à 5 avec code couleur du design system ;
-- affichage des experts internes ;
-- analyse des écarts par poste ;
-- conservation des statistiques de Wissam Benboudouh dans la matrice.
+## 7. Swagger
 
-### Recommandations
+Swagger documente les formations, sessions, inscriptions, compétences, recommandations, quiz, certifications, notifications, authentification et chatbot.
 
-- calcul des recommandations à partir des écarts ;
-- affichage des formations recommandées ;
-- score de pertinence ;
-- lien vers la formation correspondante.
+L’endpoint `POST /api/chatbot/message` accepte un identifiant employé optionnel pour le mode visiteur. Les endpoints du catalogue documentent le filtre `modalite` avec les valeurs `presentiel` et `e_learning`.
 
-### Formations et sessions
+Les fichiers `swagger-local.json` et `swagger-improved.json` sont des snapshots régénérés depuis `/api/docs-json`.
 
-- catalogue de formations ;
-- détail d’une formation ;
-- sessions programmées ;
-- plusieurs sessions par formation ;
-- cas avec deux sessions, une session ou aucune session ;
-- inscription de l’employé à une session.
+## 8. Tests et validation
 
-### Parcours e-learning
+- backend build : réussi ;
+- tests backend : 18 suites, 231 tests réussis ;
+- frontend lint : aucune erreur ;
+- frontend TypeScript : aucune erreur ;
+- frontend build : réussi ;
+- test E2E du parcours formation exécuté avec succès.
 
-- affichage des chapitres ;
-- progression locale de l’employé ;
-- validation des chapitres ;
-- accès au quiz lorsque les chapitres sont terminés ;
-- gestion du cas où le quiz n’est pas encore disponible.
+## 9. Conclusion
 
-### Quiz et Performance
-
-- chargement des questions et réponses ;
-- calcul du score ;
-- vérification du seuil de réussite ;
-- mise à jour du niveau de compétence après réussite ;
-- création d’une tâche `formation_validee` ou `revoir_quiz` ;
-- publication de l’événement `quiz_termine`.
-
-### Certification — collaboration Lot 9
-
-- vérification du score et du seuil requis ;
-- récupération de la formation, de la date et du score ;
-- génération du certificat PDF ;
-- design du certificat harmonisé avec le modèle validé ;
-- stockage du fichier dans MinIO ;
-- enregistrement de la certification en base ;
-- téléchargement depuis `/certifications/:id/download` ;
-- affichage du certificat dans le profil employé.
-
-### Dossier employé — collaboration Lot 3
-
-- affichage du profil employé ;
-- ajout et modification d’un contrat ;
-- ajout et modification d’un diplôme ;
-- ajout et modification d’un document ;
-- aide de saisie expliquant les champs à remplir.
-
-### Design system — collaboration Lot 11
-
-- couleurs Sauge, Brume, Ocre et Encre ;
-- cartes et boutons harmonisés ;
-- icônes et barre de navigation ;
-- adaptation responsive ;
-- spinners lors des chargements ;
-- harmonisation des écrans profil, compétences, formations et certifications.
-
-## 5. Intégration Swagger
-
-Les contrôleurs documentent les endpoints d’authentification, profil, compétences, écarts, recommandations, formations, sessions, inscriptions, quiz, tâches, événements Performance, certifications et Lot 3.
-
-Swagger est accessible avec :
-
-```text
-http://localhost:3000/api/docs
-```
-
-Swagger documente les API backend. Les éléments visuels frontend et les tâches de gestion de projet sont vérifiés séparément.
-
-## 6. Tests réalisés
-
-### Tests backend
-
-- 18 suites réussies ;
-- 231 tests réussis ;
-- tests des inscriptions, tâches, événements Performance, quiz et certifications.
-
-### Test E2E Playwright
-
-Le scénario `frontend/tests/learning-journey.spec.ts` vérifie le flux complet :
-
-1. création d’un profil de test ;
-2. création d’une compétence ;
-3. détection d’un écart ;
-4. récupération d’une recommandation ;
-5. création d’une session ;
-6. inscription ;
-7. création d’une tâche d’apprentissage ;
-8. création d’un événement d’inscription ;
-9. création et passage du quiz ;
-10. mise à jour de la compétence ;
-11. création de la certification ;
-12. vérification de l’événement `quiz_termine`.
-
-Résultat vérifié : **1 test E2E réussi**.
-
-### Compilation
-
-- frontend `npm run build` : réussie ;
-- backend `npm run build` : réussie ;
-- vérification TypeScript frontend : aucune erreur.
-
-## 7. Conclusion
-
-Le projet couvre le flux métier demandé et les intégrations entre les modules Formation, Compétences et Performance. Les collaborations avec le Lot 3 pour le dossier employé, le Lot 9 pour la certification et le Lot 11 pour le design system sont intégrées dans l’implémentation et identifiées dans les fonctionnalités concernées.
-
-Le parcours principal est validé par les tests backend et le test E2E Playwright.
+Le projet est organisé en modules frontend et backend cohérents, respecte les couleurs principales du design system et couvre les flux de formation, compétences, inscription, certification et assistance conversationnelle. Les contrôles d’authentification doivent continuer à être étendus aux autres contrôleurs métier avant une mise en production complète.

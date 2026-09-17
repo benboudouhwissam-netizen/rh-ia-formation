@@ -30,7 +30,9 @@ describe('EnrollmentsService', () => {
   };
   const learningTasksMock = { create: jest.fn() };
   const performanceEventsMock = { publish: jest.fn() };
-  const trainingSessionMock = { findOne: jest.fn().mockResolvedValue({ id: 'session-1', capacite: null }) };
+  const trainingSessionMock = {
+    findOne: jest.fn().mockResolvedValue({ id: 'session-1', capacite: null }),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -51,13 +53,9 @@ describe('EnrollmentsService', () => {
       ],
     }).compile();
 
-    service = module.get<EnrollmentsService>(
-      EnrollmentsService,
-    );
+    service = module.get<EnrollmentsService>(EnrollmentsService);
 
-    repository = module.get(
-      getRepositoryToken(Enrollment),
-    );
+    repository = module.get(getRepositoryToken(Enrollment));
   });
 
   it('should be defined', () => {
@@ -77,18 +75,13 @@ describe('EnrollmentsService', () => {
         getManyAndCount: jest.fn(),
       };
 
-      repository.createQueryBuilder.mockReturnValue(
-        queryBuilder,
-      );
+      repository.createQueryBuilder.mockReturnValue(queryBuilder);
     });
 
     it('should return all enrollments', async () => {
       const enrollments = [enrollment];
 
-      queryBuilder.getManyAndCount.mockResolvedValue([
-        enrollments,
-        1,
-      ]);
+      queryBuilder.getManyAndCount.mockResolvedValue([enrollments, 1]);
 
       const result = await service.findAll({});
 
@@ -99,16 +92,11 @@ describe('EnrollmentsService', () => {
         offset: 0,
       });
 
-      expect(repository.createQueryBuilder).toHaveBeenCalledWith(
-        'enrollment',
-      );
+      expect(repository.createQueryBuilder).toHaveBeenCalledWith('enrollment');
     });
 
     it('should apply pagination', async () => {
-      queryBuilder.getManyAndCount.mockResolvedValue([
-        [enrollment],
-        20,
-      ]);
+      queryBuilder.getManyAndCount.mockResolvedValue([[enrollment], 20]);
 
       const result = await service.findAll({
         limit: 5,
@@ -123,10 +111,7 @@ describe('EnrollmentsService', () => {
     });
 
     it('should filter by utilisateur_id', async () => {
-      queryBuilder.getManyAndCount.mockResolvedValue([
-        [enrollment],
-        1,
-      ]);
+      queryBuilder.getManyAndCount.mockResolvedValue([[enrollment], 1]);
 
       await service.findAll({
         utilisateur_id: 'employee-123',
@@ -141,10 +126,7 @@ describe('EnrollmentsService', () => {
     });
 
     it('should filter by training_session_id', async () => {
-      queryBuilder.getManyAndCount.mockResolvedValue([
-        [enrollment],
-        1,
-      ]);
+      queryBuilder.getManyAndCount.mockResolvedValue([[enrollment], 1]);
 
       await service.findAll({
         training_session_id: 'session-123',
@@ -159,10 +141,7 @@ describe('EnrollmentsService', () => {
     });
 
     it('should filter by statut', async () => {
-      queryBuilder.getManyAndCount.mockResolvedValue([
-        [enrollment],
-        1,
-      ]);
+      queryBuilder.getManyAndCount.mockResolvedValue([[enrollment], 1]);
 
       await service.findAll({
         statut: 'inscrit',
@@ -177,10 +156,7 @@ describe('EnrollmentsService', () => {
     });
 
     it('should apply multiple filters', async () => {
-      queryBuilder.getManyAndCount.mockResolvedValue([
-        [enrollment],
-        1,
-      ]);
+      queryBuilder.getManyAndCount.mockResolvedValue([[enrollment], 1]);
 
       await service.findAll({
         utilisateur_id: 'employee-123',
@@ -211,9 +187,7 @@ describe('EnrollmentsService', () => {
     it('should throw an error when enrollment does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.findOne('999'),
-      ).rejects.toThrow(
+      await expect(service.findOne('999')).rejects.toThrow(
         'Enrollment with ID 999 not found',
       );
     });
@@ -223,13 +197,9 @@ describe('EnrollmentsService', () => {
     it('should create an enrollment', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      repository.create.mockReturnValue(
-        enrollment,
-      );
+      repository.create.mockReturnValue(enrollment);
 
-      repository.save.mockResolvedValue(
-        enrollment,
-      );
+      repository.save.mockResolvedValue(enrollment);
 
       const result = await service.create({
         utilisateur_id: 'employee-1',
@@ -241,9 +211,7 @@ describe('EnrollmentsService', () => {
       expect(result).toEqual(enrollment);
 
       expect(repository.create).toHaveBeenCalled();
-      expect(repository.save).toHaveBeenCalledWith(
-        enrollment,
-      );
+      expect(repository.save).toHaveBeenCalledWith(enrollment);
       expect(learningTasksMock.create).toHaveBeenCalledWith(
         expect.objectContaining({
           utilisateur_id: 'employee-1',
@@ -252,14 +220,15 @@ describe('EnrollmentsService', () => {
         }),
       );
       expect(performanceEventsMock.publish).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'inscription_formation', reference_id: '1' }),
+        expect.objectContaining({
+          type: 'inscription_formation',
+          reference_id: '1',
+        }),
       );
     });
 
     it('should reject duplicate enrollment', async () => {
-      repository.findOne.mockResolvedValue(
-        enrollment,
-      );
+      repository.findOne.mockResolvedValue(enrollment);
 
       await expect(
         service.create({
@@ -273,9 +242,7 @@ describe('EnrollmentsService', () => {
     });
 
     it('should propagate repository errors', async () => {
-      repository.findOne.mockRejectedValue(
-        new Error('Database error'),
-      );
+      repository.findOne.mockRejectedValue(new Error('Database error'));
 
       await expect(
         service.create({
@@ -291,12 +258,9 @@ describe('EnrollmentsService', () => {
     it('should update an enrollment', async () => {
       const existing = {
         ...enrollment,
-      } as Enrollment;
+      };
 
-      repository.findOne.mockResolvedValue(
-        existing,
-      );
-
+      repository.findOne.mockResolvedValue(existing);
 
       repository.save.mockImplementation(
         async (entity) => entity as Enrollment,
@@ -321,21 +285,15 @@ describe('EnrollmentsService', () => {
         service.update('999', {
           statut: 'termine',
         }),
-      ).rejects.toThrow(
-        'Enrollment with ID 999 not found',
-      );
+      ).rejects.toThrow('Enrollment with ID 999 not found');
     });
   });
 
   describe('remove', () => {
     it('should remove an enrollment', async () => {
-      repository.findOne.mockResolvedValue(
-        enrollment,
-      );
+      repository.findOne.mockResolvedValue(enrollment);
 
-      repository.remove.mockResolvedValue(
-        enrollment,
-      );
+      repository.remove.mockResolvedValue(enrollment);
 
       const result = await service.remove('1');
 
@@ -343,17 +301,13 @@ describe('EnrollmentsService', () => {
         message: 'Enrollment deleted successfully',
       });
 
-      expect(repository.remove).toHaveBeenCalledWith(
-        enrollment,
-      );
+      expect(repository.remove).toHaveBeenCalledWith(enrollment);
     });
 
     it('should throw an error when enrollment does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.remove('999'),
-      ).rejects.toThrow(
+      await expect(service.remove('999')).rejects.toThrow(
         'Enrollment with ID 999 not found',
       );
     });

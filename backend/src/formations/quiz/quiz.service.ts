@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,12 +15,7 @@ export class QuizService {
   ) {}
 
   async findAll(filterDto: FilterQuizDto) {
-    const {
-      limit = 10,
-      offset = 0,
-      formation_id,
-      statut,
-    } = filterDto;
+    const { limit = 10, offset = 0, formation_id, statut } = filterDto;
 
     const queryBuilder = this.quizRepository
       .createQueryBuilder('quiz')
@@ -32,21 +24,16 @@ export class QuizService {
       .skip(offset);
 
     if (formation_id) {
-      queryBuilder.andWhere(
-        'quiz.formation_id = :formation_id',
-        { formation_id },
-      );
+      queryBuilder.andWhere('quiz.formation_id = :formation_id', {
+        formation_id,
+      });
     }
 
     if (statut) {
-      queryBuilder.andWhere(
-        'quiz.statut = :statut',
-        { statut },
-      );
+      queryBuilder.andWhere('quiz.statut = :statut', { statut });
     }
 
-    const [data, total] =
-      await queryBuilder.getManyAndCount();
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     return {
       data,
@@ -65,26 +52,19 @@ export class QuizService {
     });
 
     if (!quiz) {
-      throw new NotFoundException(
-        `Quiz with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Quiz with ID ${id} not found`);
     }
 
     return quiz;
   }
 
   async create(createQuizDto: CreateQuizDto) {
-    const quiz = this.quizRepository.create(
-      createQuizDto,
-    );
+    const quiz = this.quizRepository.create(createQuizDto);
 
     return this.quizRepository.save(quiz);
   }
 
-  async update(
-    id: string,
-    updateQuizDto: UpdateQuizDto,
-  ) {
+  async update(id: string, updateQuizDto: UpdateQuizDto) {
     const quiz = await this.findOne(id);
 
     Object.assign(quiz, updateQuizDto);

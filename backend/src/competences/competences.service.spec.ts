@@ -311,9 +311,7 @@ describe('CompetencesService - findAll', () => {
       niveau: 'Avancé',
     };
 
-    const error = new Error(
-      'Erreur lors de la création de la compétence',
-    );
+    const error = new Error('Erreur lors de la création de la compétence');
 
     mockRepository.create.mockReturnValue(createData);
     mockRepository.save.mockRejectedValue(error);
@@ -360,9 +358,7 @@ describe('CompetencesService - findAll', () => {
 
     expect(mockRepository.findOne).toHaveBeenCalledTimes(1);
 
-    expect(mockRepository.save).toHaveBeenCalledWith(
-      existingCompetence,
-    );
+    expect(mockRepository.save).toHaveBeenCalledWith(existingCompetence);
 
     expect(mockRepository.save).toHaveBeenCalledTimes(1);
   });
@@ -376,9 +372,7 @@ describe('CompetencesService - findAll', () => {
       service.update(id, {
         niveau: 'Avancé',
       }),
-    ).rejects.toThrow(
-      "Compétence avec l'id 999 introuvable",
-    );
+    ).rejects.toThrow("Compétence avec l'id 999 introuvable");
 
     expect(mockRepository.findOne).toHaveBeenCalledWith({
       where: {
@@ -453,25 +447,17 @@ describe('CompetencesService - findAll', () => {
   it('searchSimilar - should propagate AI service errors', async () => {
     const query = 'NestJS';
 
-    const error = new Error(
-      'Erreur lors de la génération de l embedding',
-    );
+    const error = new Error('Erreur lors de la génération de l embedding');
 
     mockAiService.generateEmbedding.mockRejectedValue(error);
 
-    await expect(
-      service.searchSimilar(query),
-    ).rejects.toThrow(
+    await expect(service.searchSimilar(query)).rejects.toThrow(
       'Erreur lors de la génération de l embedding',
     );
 
-    expect(
-      mockAiService.generateEmbedding,
-    ).toHaveBeenCalledWith(query);
+    expect(mockAiService.generateEmbedding).toHaveBeenCalledWith(query);
 
-    expect(
-      mockAiService.generateEmbedding,
-    ).toHaveBeenCalledTimes(1);
+    expect(mockAiService.generateEmbedding).toHaveBeenCalledTimes(1);
 
     expect(mockRepository.query).not.toHaveBeenCalled();
   });

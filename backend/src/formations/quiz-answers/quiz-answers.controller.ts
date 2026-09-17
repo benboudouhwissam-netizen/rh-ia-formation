@@ -19,13 +19,14 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 @ApiTags('quiz')
 @Controller('quiz-answers')
 export class QuizAnswersController {
-  constructor(
-    private readonly quizAnswersService: QuizAnswersService,
-  ) {}
+  constructor(private readonly quizAnswersService: QuizAnswersService) {}
 
   @Get()
   @ApiOperation({ summary: 'Lister les réponses de quiz (avec filtres)' })
-  @ApiResponse({ status: 200, description: 'Liste des réponses correspondant aux filtres' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des réponses correspondant aux filtres',
+  })
   findAll(@Query() filterDto: FilterQuizAnswerDto) {
     return this.quizAnswersService.findAll(filterDto);
   }
@@ -49,10 +50,7 @@ export class QuizAnswersController {
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour une réponse de quiz' })
   @ApiParam({ name: 'id', description: 'UUID de la réponse' })
-  update(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateQuizAnswerDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateDto: UpdateQuizAnswerDto) {
     return this.quizAnswersService.update(id, updateDto);
   }
 

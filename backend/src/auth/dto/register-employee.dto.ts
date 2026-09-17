@@ -1,4 +1,13 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterEmployeeDto {
@@ -20,7 +29,10 @@ export class RegisterEmployeeDto {
   mot_de_passe: string;
 
   @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
-  @ApiProperty({ example: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', description: 'UUID du poste' })
+  @ApiProperty({
+    example: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    description: 'UUID du poste',
+  })
   poste_id: string;
 
   @IsOptional()

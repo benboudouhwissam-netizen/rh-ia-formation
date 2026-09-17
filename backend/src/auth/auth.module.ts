@@ -8,8 +8,12 @@ import { FormationsModule } from '../formations/formations.module';
 import { Contract } from '../lot3/entities/contract.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EmployeeAccount, EmployeeAuthSession, Contract]), FormationsModule],
+  imports: [
+    TypeOrmModule.forFeature([EmployeeAccount, EmployeeAuthSession, Contract]),
+    FormationsModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}

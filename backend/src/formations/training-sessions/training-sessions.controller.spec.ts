@@ -30,9 +30,7 @@ describe('TrainingSessionsController', () => {
       TrainingSessionsController,
     );
 
-    service = module.get<TrainingSessionsService>(
-      TrainingSessionsService,
-    );
+    service = module.get<TrainingSessionsService>(TrainingSessionsService);
 
     jest.clearAllMocks();
   });
@@ -126,10 +124,7 @@ describe('TrainingSessionsController', () => {
 
       expect(await controller.update(id, updateDto)).toEqual(result);
 
-      expect(service.update).toHaveBeenCalledWith(
-        id,
-        updateDto,
-      );
+      expect(service.update).toHaveBeenCalledWith(id, updateDto);
     });
   });
 

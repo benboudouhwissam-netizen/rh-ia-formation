@@ -40,6 +40,7 @@ import { EmployeeCompetence } from '../competences/entities/employee-competence.
 import { Certification } from '../competences/entities/certification.entity';
 
 import { AiModule } from '../ai/ai.module';
+import { SessionAuthGuard } from '../auth/guards/session-auth.guard';
 
 @Module({
   imports: [
@@ -86,6 +87,7 @@ import { AiModule } from '../ai/ai.module';
     QuizAttemptsService,
     LearningTasksService,
     PerformanceEventsService,
+    SessionAuthGuard,
   ],
 
   exports: [

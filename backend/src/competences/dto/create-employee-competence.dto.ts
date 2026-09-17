@@ -1,4 +1,12 @@
-import { IsIn, IsInt, IsOptional, IsUUID, Matches, Max, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateEmployeeCompetenceDto {
@@ -17,7 +25,10 @@ export class CreateEmployeeCompetenceDto {
   niveau: number;
 
   @IsOptional()
-  @ApiPropertyOptional({ enum: ['auto_evalue', 'manager', 'certifie', 'ia_estime', 'quiz'], example: 'auto_evalue' })
+  @ApiPropertyOptional({
+    enum: ['auto_evalue', 'manager', 'certifie', 'ia_estime', 'quiz'],
+    example: 'auto_evalue',
+  })
   @IsIn(['auto_evalue', 'manager', 'certifie', 'ia_estime', 'quiz'])
   source?: string;
 }

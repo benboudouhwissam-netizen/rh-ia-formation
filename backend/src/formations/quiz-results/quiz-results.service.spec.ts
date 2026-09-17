@@ -40,20 +40,17 @@ describe('QuizResultsService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    const module: TestingModule =
-      await Test.createTestingModule({
-        providers: [
-          QuizResultsService,
-          {
-            provide: getRepositoryToken(QuizResult),
-            useValue: repository,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        QuizResultsService,
+        {
+          provide: getRepositoryToken(QuizResult),
+          useValue: repository,
+        },
+      ],
+    }).compile();
 
-    service = module.get<QuizResultsService>(
-      QuizResultsService,
-    );
+    service = module.get<QuizResultsService>(QuizResultsService);
   });
 
   it('should be defined', () => {
@@ -62,10 +59,7 @@ describe('QuizResultsService', () => {
 
   describe('findAll', () => {
     it('should return all quiz results', async () => {
-      repository.findAndCount.mockResolvedValue([
-        results,
-        2,
-      ]);
+      repository.findAndCount.mockResolvedValue([results, 2]);
 
       const result = await service.findAll({});
 
@@ -90,10 +84,7 @@ describe('QuizResultsService', () => {
     });
 
     it('should apply pagination', async () => {
-      repository.findAndCount.mockResolvedValue([
-        results,
-        20,
-      ]);
+      repository.findAndCount.mockResolvedValue([results, 20]);
 
       const result = await service.findAll({
         limit: 5,
@@ -117,10 +108,7 @@ describe('QuizResultsService', () => {
     });
 
     it('should filter by quiz_id', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [results[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[results[0]], 1]);
 
       await service.findAll({
         quiz_id: 'quiz-123',
@@ -142,10 +130,7 @@ describe('QuizResultsService', () => {
     });
 
     it('should filter by utilisateur_id', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [results[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[results[0]], 1]);
 
       await service.findAll({
         utilisateur_id: 'user-123',
@@ -167,10 +152,7 @@ describe('QuizResultsService', () => {
     });
 
     it('should filter by reussi', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [results[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[results[0]], 1]);
 
       await service.findAll({
         reussi: true,
@@ -192,10 +174,7 @@ describe('QuizResultsService', () => {
     });
 
     it('should apply multiple filters', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [results[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[results[0]], 1]);
 
       await service.findAll({
         quiz_id: 'quiz-123',
@@ -244,9 +223,7 @@ describe('QuizResultsService', () => {
     it('should throw an error when quiz result does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.findOne('999'),
-      ).rejects.toThrow(
+      await expect(service.findOne('999')).rejects.toThrow(
         'Quiz result with ID 999 not found',
       );
     });
@@ -275,13 +252,9 @@ describe('QuizResultsService', () => {
 
       expect(result).toEqual(createdResult);
 
-      expect(repository.create).toHaveBeenCalledWith(
-        createDto,
-      );
+      expect(repository.create).toHaveBeenCalledWith(createDto);
 
-      expect(repository.save).toHaveBeenCalledWith(
-        createdResult,
-      );
+      expect(repository.save).toHaveBeenCalledWith(createdResult);
     });
 
     it('should propagate repository errors', async () => {
@@ -298,9 +271,7 @@ describe('QuizResultsService', () => {
       repository.create.mockReturnValue(createDto);
       repository.save.mockRejectedValue(error);
 
-      await expect(
-        service.create(createDto),
-      ).rejects.toThrow('Database error');
+      await expect(service.create(createDto)).rejects.toThrow('Database error');
     });
   });
 
@@ -323,16 +294,11 @@ describe('QuizResultsService', () => {
       repository.findOne.mockResolvedValue(result);
       repository.save.mockResolvedValue(updatedResult);
 
-      const response = await service.update(
-        '1',
-        updateDto,
-      );
+      const response = await service.update('1', updateDto);
 
       expect(response).toEqual(updatedResult);
 
-      expect(repository.save).toHaveBeenCalledWith(
-        updatedResult,
-      );
+      expect(repository.save).toHaveBeenCalledWith(updatedResult);
     });
 
     it('should throw an error when quiz result does not exist', async () => {
@@ -342,9 +308,7 @@ describe('QuizResultsService', () => {
         service.update('999', {
           score: 10,
         }),
-      ).rejects.toThrow(
-        'Quiz result with ID 999 not found',
-      );
+      ).rejects.toThrow('Quiz result with ID 999 not found');
     });
   });
 
@@ -363,17 +327,13 @@ describe('QuizResultsService', () => {
         message: 'Quiz result deleted successfully',
       });
 
-      expect(repository.remove).toHaveBeenCalledWith(
-        result,
-      );
+      expect(repository.remove).toHaveBeenCalledWith(result);
     });
 
     it('should throw an error when quiz result does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.remove('999'),
-      ).rejects.toThrow(
+      await expect(service.remove('999')).rejects.toThrow(
         'Quiz result with ID 999 not found',
       );
     });

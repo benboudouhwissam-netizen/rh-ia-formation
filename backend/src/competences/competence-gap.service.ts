@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -23,29 +20,24 @@ export class CompetenceGapService {
     private readonly formationRepository: Repository<Formation>,
   ) {}
 
-  async getCompetenceGaps(
-    utilisateurId: string,
-    posteId: string,
-  ) {
-    const currentCompetences =
-      await this.employeeCompetenceRepository.find({
-        where: {
-          utilisateur_id: utilisateurId,
-        },
-        relations: {
-          competence: true,
-        },
-      });
+  async getCompetenceGaps(utilisateurId: string, posteId: string) {
+    const currentCompetences = await this.employeeCompetenceRepository.find({
+      where: {
+        utilisateur_id: utilisateurId,
+      },
+      relations: {
+        competence: true,
+      },
+    });
 
-    const requiredCompetences =
-      await this.competenceMatriceRepository.find({
-        where: {
-          poste_id: posteId,
-        },
-        relations: {
-          competence: true,
-        },
-      });
+    const requiredCompetences = await this.competenceMatriceRepository.find({
+      where: {
+        poste_id: posteId,
+      },
+      relations: {
+        competence: true,
+      },
+    });
 
     // Seuil à partir duquel on considère qu'une compétence différente
     // couvre sémantiquement le besoin (ex: "React" ≈ "Frontend Development")
@@ -89,7 +81,10 @@ export class CompetenceGapService {
             [vector, utilisateurId, required.competence_id],
           );
 
-          if (resultats.length > 0 && Number(resultats[0].similarite) >= SEUIL_SIMILARITE) {
+          if (
+            resultats.length > 0 &&
+            Number(resultats[0].similarite) >= SEUIL_SIMILARITE
+          ) {
             competenceProche = {
               competence_id: resultats[0].competence_id,
               competence_nom: resultats[0].competence_nom,
@@ -127,14 +122,8 @@ export class CompetenceGapService {
     };
   }
 
-  async getTopRecommendedFormations(
-    utilisateurId: string,
-    posteId: string,
-  ) {
-    const { gaps } = await this.getCompetenceGaps(
-      utilisateurId,
-      posteId,
-    );
+  async getTopRecommendedFormations(utilisateurId: string, posteId: string) {
+    const { gaps } = await this.getCompetenceGaps(utilisateurId, posteId);
 
     // Étape 1 : pour chaque écart (compétence manquante), on récupère
     // ses meilleures formations candidates, triées par similarité
@@ -207,7 +196,8 @@ export class CompetenceGapService {
     // (celle dont la meilleure formation est la plus pertinente passe
     // en premier dans le tirage round-robin)
     candidatsParCompetence.sort(
-      (a, b) => b.candidats[0].score_pertinence - a.candidats[0].score_pertinence,
+      (a, b) =>
+        b.candidats[0].score_pertinence - a.candidats[0].score_pertinence,
     );
 
     // Étape 3 : round-robin — on prend une formation par compétence,

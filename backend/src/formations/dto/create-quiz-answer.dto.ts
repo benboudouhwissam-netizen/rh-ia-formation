@@ -18,7 +18,8 @@ export class CreateQuizAnswerDto {
   question_id: string;
 
   @ApiProperty({
-    example: "Aligner les compétences des employés avec les besoins de l'entreprise",
+    example:
+      "Aligner les compétences des employés avec les besoins de l'entreprise",
   })
   @IsString()
   @IsNotEmpty()
@@ -33,7 +34,10 @@ export class CreateQuizAnswerDto {
   @IsBoolean()
   est_correcte?: boolean;
 
-  @ApiPropertyOptional({ example: 1, description: "Ordre d'affichage de la réponse" })
+  @ApiPropertyOptional({
+    example: 1,
+    description: "Ordre d'affichage de la réponse",
+  })
   @IsOptional()
   @IsInt()
   ordre?: number;

@@ -86,7 +86,9 @@ export class QuizAttemptsService {
         });
 
         const normaliser = (texte: string) => texte.trim().toLowerCase();
-        const texteAttendu = bonneReponse ? normaliser(bonneReponse.answer) : '';
+        const texteAttendu = bonneReponse
+          ? normaliser(bonneReponse.answer)
+          : '';
         const texteSoumis = normaliser(reponseSoumise?.texte_libre ?? '');
 
         estCorrecte = texteAttendu.length > 0 && texteAttendu === texteSoumis;
@@ -129,10 +131,17 @@ export class QuizAttemptsService {
     const saved = await this.quizResultRepository.save(result);
 
     const competencesUpdated = reussi
-      ? await this.updateProfileFromPassedQuiz(quiz.formation_id, dto.utilisateur_id)
+      ? await this.updateProfileFromPassedQuiz(
+          quiz.formation_id,
+          dto.utilisateur_id,
+        )
       : 0;
     const certificationsCreated = reussi
-      ? await this.createCertifications(quiz.formation_id, dto.utilisateur_id, quiz.titre)
+      ? await this.createCertifications(
+          quiz.formation_id,
+          dto.utilisateur_id,
+          quiz.titre,
+        )
       : 0;
 
     await this.learningTasksService.create({
@@ -142,13 +151,24 @@ export class QuizAttemptsService {
       message: reussi
         ? 'Quiz validé : votre profil de compétences a été mis à jour.'
         : 'Quiz terminé : consultez vos réponses avant une nouvelle tentative.',
-      payload: { quiz_id: dto.quiz_id, score, reussi, competences_updated: competencesUpdated, certifications_created: certificationsCreated },
+      payload: {
+        quiz_id: dto.quiz_id,
+        score,
+        reussi,
+        competences_updated: competencesUpdated,
+        certifications_created: certificationsCreated,
+      },
     });
     await this.performanceEventsService.publish({
       utilisateur_id: dto.utilisateur_id,
       type: 'quiz_termine',
       reference_id: saved.id,
-      payload: { quiz_id: dto.quiz_id, score, reussi, competences_updated: competencesUpdated },
+      payload: {
+        quiz_id: dto.quiz_id,
+        score,
+        reussi,
+        competences_updated: competencesUpdated,
+      },
     });
 
     return {
@@ -161,19 +181,31 @@ export class QuizAttemptsService {
     };
   }
 
-  private async updateProfileFromPassedQuiz(formationId: string, utilisateurId: string) {
-    const links = await this.formationCompetenceRepository.find({ where: { formation_id: formationId } });
+  private async updateProfileFromPassedQuiz(
+    formationId: string,
+    utilisateurId: string,
+  ) {
+    const links = await this.formationCompetenceRepository.find({
+      where: { formation_id: formationId },
+    });
     let updated = 0;
 
     for (const link of links) {
       if (!link.niveau_vise) continue;
       const existing = await this.employeeCompetenceRepository.findOne({
-        where: { utilisateur_id: utilisateurId, competence_id: link.competence_id },
+        where: {
+          utilisateur_id: utilisateurId,
+          competence_id: link.competence_id,
+        },
       });
       if (!existing || existing.niveau < link.niveau_vise) {
         await this.employeeCompetenceRepository.save(
           existing
-            ? Object.assign(existing, { niveau: link.niveau_vise, source: 'quiz', date_evaluation: new Date() })
+            ? Object.assign(existing, {
+                niveau: link.niveau_vise,
+                source: 'quiz',
+                date_evaluation: new Date(),
+              })
             : this.employeeCompetenceRepository.create({
                 utilisateur_id: utilisateurId,
                 competence_id: link.competence_id,
@@ -189,17 +221,28 @@ export class QuizAttemptsService {
     return updated;
   }
 
-  private async createCertifications(formationId: string, utilisateurId: string, quizTitle: string) {
-    const links = await this.formationCompetenceRepository.find({ where: { formation_id: formationId } });
+  private async createCertifications(
+    formationId: string,
+    utilisateurId: string,
+    quizTitle: string,
+  ) {
+    const links = await this.formationCompetenceRepository.find({
+      where: { formation_id: formationId },
+    });
     let created = 0;
     const dateObtention = new Date().toISOString().slice(0, 10);
     let certificationForFormation: Certification | null = null;
 
     for (const link of links) {
       const nomCertification = `Validation — ${quizTitle}`;
-      const existing = certificationForFormation ?? await this.certificationRepository.findOne({
-        where: { utilisateur_id: utilisateurId, nom_certification: nomCertification },
-      });
+      const existing =
+        certificationForFormation ??
+        (await this.certificationRepository.findOne({
+          where: {
+            utilisateur_id: utilisateurId,
+            nom_certification: nomCertification,
+          },
+        }));
       // L'index unique de la migration 024 et l'upsert rendent cette
       // opération idempotente : deux soumissions simultanées du même quiz
       // ne peuvent plus créer deux certificats identiques.
@@ -216,14 +259,23 @@ export class QuizAttemptsService {
           ['utilisateur_id', 'nom_certification'],
         );
       }
-      const certification = existing ?? await this.certificationRepository.findOne({
-        where: { utilisateur_id: utilisateurId, nom_certification: nomCertification },
-      });
+      const certification =
+        existing ??
+        (await this.certificationRepository.findOne({
+          where: {
+            utilisateur_id: utilisateurId,
+            nom_certification: nomCertification,
+          },
+        }));
       if (!certification) continue;
       certificationForFormation = certification;
-      const certificateLink = await this.linkCertificationFormationRepository.findOne({
-        where: { certification_id: certification.id, formation_id: formationId },
-      });
+      const certificateLink =
+        await this.linkCertificationFormationRepository.findOne({
+          where: {
+            certification_id: certification.id,
+            formation_id: formationId,
+          },
+        });
       if (!certificateLink) {
         await this.linkCertificationFormationRepository.save(
           this.linkCertificationFormationRepository.create({

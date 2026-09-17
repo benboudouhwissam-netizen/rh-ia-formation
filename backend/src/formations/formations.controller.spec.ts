@@ -15,20 +15,17 @@ describe('FormationsController', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        controllers: [FormationsController],
-        providers: [
-          {
-            provide: FormationsService,
-            useValue: mockService,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [FormationsController],
+      providers: [
+        {
+          provide: FormationsService,
+          useValue: mockService,
+        },
+      ],
+    }).compile();
 
-    controller = module.get<FormationsController>(
-      FormationsController,
-    );
+    controller = module.get<FormationsController>(FormationsController);
 
     jest.clearAllMocks();
   });
@@ -145,15 +142,11 @@ describe('FormationsController', () => {
   it('GET /api/formations/:id - should propagate service errors', async () => {
     const id = '999';
 
-    const error = new Error(
-      "Formation avec l'id 999 introuvable",
-    );
+    const error = new Error("Formation avec l'id 999 introuvable");
 
     mockService.findOne.mockRejectedValue(error);
 
-    await expect(
-      controller.findOne(id),
-    ).rejects.toThrow(
+    await expect(controller.findOne(id)).rejects.toThrow(
       "Formation avec l'id 999 introuvable",
     );
 
@@ -161,15 +154,11 @@ describe('FormationsController', () => {
   });
 
   it('GET /api/formations - should propagate service errors', async () => {
-    const error = new Error(
-      'Erreur lors de la récupération des formations',
-    );
+    const error = new Error('Erreur lors de la récupération des formations');
 
     mockService.findAll.mockRejectedValue(error);
 
-    await expect(
-      controller.findAll({}),
-    ).rejects.toThrow(
+    await expect(controller.findAll({})).rejects.toThrow(
       'Erreur lors de la récupération des formations',
     );
   });
@@ -194,9 +183,7 @@ describe('FormationsController', () => {
 
     expect(response).toEqual(result);
 
-    expect(mockService.create).toHaveBeenCalledWith(
-      createData,
-    );
+    expect(mockService.create).toHaveBeenCalledWith(createData);
 
     expect(mockService.create).toHaveBeenCalledTimes(1);
   });
@@ -206,21 +193,15 @@ describe('FormationsController', () => {
       titre: 'Formation NestJS',
     };
 
-    const error = new Error(
-      'Erreur lors de la création de la formation',
-    );
+    const error = new Error('Erreur lors de la création de la formation');
 
     mockService.create.mockRejectedValue(error);
 
-    await expect(
-      controller.create(createData),
-    ).rejects.toThrow(
+    await expect(controller.create(createData)).rejects.toThrow(
       'Erreur lors de la création de la formation',
     );
 
-    expect(mockService.create).toHaveBeenCalledWith(
-      createData,
-    );
+    expect(mockService.create).toHaveBeenCalledWith(createData);
   });
 
   it('PUT /api/formations/:id - should update a formation', async () => {
@@ -239,17 +220,11 @@ describe('FormationsController', () => {
 
     mockService.update.mockResolvedValue(result);
 
-    const response = await controller.update(
-      id,
-      updateData,
-    );
+    const response = await controller.update(id, updateData);
 
     expect(response).toEqual(result);
 
-    expect(mockService.update).toHaveBeenCalledWith(
-      id,
-      updateData,
-    );
+    expect(mockService.update).toHaveBeenCalledWith(id, updateData);
 
     expect(mockService.update).toHaveBeenCalledTimes(1);
   });
@@ -261,15 +236,11 @@ describe('FormationsController', () => {
       titre: 'Nouvelle formation',
     };
 
-    const error = new Error(
-      "Formation avec l'id 999 introuvable",
-    );
+    const error = new Error("Formation avec l'id 999 introuvable");
 
     mockService.update.mockRejectedValue(error);
 
-    await expect(
-      controller.update(id, updateData),
-    ).rejects.toThrow(
+    await expect(controller.update(id, updateData)).rejects.toThrow(
       "Formation avec l'id 999 introuvable",
     );
   });
@@ -290,15 +261,11 @@ describe('FormationsController', () => {
   it('DELETE /api/formations/:id - should propagate service errors', async () => {
     const id = '999';
 
-    const error = new Error(
-      "Formation avec l'id 999 introuvable",
-    );
+    const error = new Error("Formation avec l'id 999 introuvable");
 
     mockService.remove.mockRejectedValue(error);
 
-    await expect(
-      controller.remove(id),
-    ).rejects.toThrow(
+    await expect(controller.remove(id)).rejects.toThrow(
       "Formation avec l'id 999 introuvable",
     );
 

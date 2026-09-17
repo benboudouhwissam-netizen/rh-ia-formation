@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { Lot3Editor } from '../lot3/Lot3Editor';
 import { NotificationCenter } from './NotificationCenter';
+import { Chatbot } from './Chatbot';
 
 type Section = 'formations' | 'competences' | 'support';
 
@@ -21,5 +22,6 @@ export function AppShell({ children, active, onSearch }: { children: ReactNode; 
       {employee ? <button type="button" onClick={() => void logout()} className="mt-auto rounded-lg px-3 py-2.5 text-left text-sm text-ardoise">Se déconnecter</button> : <Link href="/connexion" className="mt-auto rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-sauge-700 hover:bg-sauge/10">Se connecter</Link>}
     </aside>
     <div className="min-h-screen md:pl-[260px]"><header className="flex h-[72px] items-center border-b border-ardoise/12 bg-white px-4 md:px-7"><h1 className="hidden text-xl font-semibold lg:block">Plateforme RH</h1><div className="ml-auto flex items-center gap-3"><input className="hidden w-56 rounded-full border border-ardoise/15 bg-brume px-3 py-2 text-xs md:block" placeholder="Rechercher une formation…" onChange={(event) => onSearch?.(event.target.value)} /><NotificationCenter /><Link href="/support" aria-label="Ouvrir le centre d'aide" className="p-2 text-ardoise"><i className="fa-regular fa-circle-question text-base" /></Link></div></header><main className="mx-auto w-full max-w-[1440px] px-4 py-6 md:px-8 md:py-8">{children}{pathname === '/profil' && <Lot3Editor />}</main></div>
+    <Chatbot />
   </div>;
 }

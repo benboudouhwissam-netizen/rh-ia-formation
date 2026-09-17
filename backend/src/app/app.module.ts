@@ -7,6 +7,7 @@ import { AiModule } from '../ai/ai.module';
 import { FormationsModule } from '../formations/formations.module';
 import { AuthModule } from '../auth/auth.module';
 import { Lot3Module } from '../lot3/lot3.module';
+import { ChatbotModule } from '../chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { Lot3Module } from '../lot3/lot3.module';
     AuthModule,
     AiModule,
     Lot3Module,
+    ChatbotModule,
   ],
 })
 export class AppModule {}

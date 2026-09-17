@@ -1,9 +1,4 @@
-import {
-  IsBoolean,
-  IsDateString,
-  IsInt,
-  IsOptional,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, IsOptional } from 'class-validator';
 
 export class UpdateQuizResultDto {
   @IsOptional()

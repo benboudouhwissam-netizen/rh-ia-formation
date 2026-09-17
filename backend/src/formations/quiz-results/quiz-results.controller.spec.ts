@@ -36,20 +36,17 @@ describe('QuizResultsController', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    const module: TestingModule =
-      await Test.createTestingModule({
-        controllers: [QuizResultsController],
-        providers: [
-          {
-            provide: QuizResultsService,
-            useValue: service,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [QuizResultsController],
+      providers: [
+        {
+          provide: QuizResultsService,
+          useValue: service,
+        },
+      ],
+    }).compile();
 
-    controller = module.get<QuizResultsController>(
-      QuizResultsController,
-    );
+    controller = module.get<QuizResultsController>(QuizResultsController);
   });
 
   it('should be defined', () => {
@@ -177,9 +174,7 @@ describe('QuizResultsController', () => {
 
       service.findAll.mockRejectedValue(error);
 
-      await expect(
-        controller.findAll({}),
-      ).rejects.toThrow('Service error');
+      await expect(controller.findAll({})).rejects.toThrow('Service error');
     });
   });
 
@@ -194,13 +189,11 @@ describe('QuizResultsController', () => {
     });
 
     it('GET /api/quiz-results/:id - should propagate service errors', async () => {
-      service.findOne.mockRejectedValue(
-        new Error('Quiz result not found'),
-      );
+      service.findOne.mockRejectedValue(new Error('Quiz result not found'));
 
-      await expect(
-        controller.findOne('999'),
-      ).rejects.toThrow('Quiz result not found');
+      await expect(controller.findOne('999')).rejects.toThrow(
+        'Quiz result not found',
+      );
     });
   });
 
@@ -228,9 +221,7 @@ describe('QuizResultsController', () => {
     });
 
     it('POST /api/quiz-results - should propagate service errors', async () => {
-      service.create.mockRejectedValue(
-        new Error('Service error'),
-      );
+      service.create.mockRejectedValue(new Error('Service error'));
 
       await expect(
         controller.create({
@@ -255,22 +246,14 @@ describe('QuizResultsController', () => {
 
       service.update.mockResolvedValue(updatedResult);
 
-      const result = await controller.update(
-        '1',
-        updateDto,
-      );
+      const result = await controller.update('1', updateDto);
 
       expect(result).toEqual(updatedResult);
-      expect(service.update).toHaveBeenCalledWith(
-        '1',
-        updateDto,
-      );
+      expect(service.update).toHaveBeenCalledWith('1', updateDto);
     });
 
     it('PUT /api/quiz-results/:id - should propagate service errors', async () => {
-      service.update.mockRejectedValue(
-        new Error('Service error'),
-      );
+      service.update.mockRejectedValue(new Error('Service error'));
 
       await expect(
         controller.update('999', {
@@ -295,13 +278,9 @@ describe('QuizResultsController', () => {
     });
 
     it('DELETE /api/quiz-results/:id - should propagate service errors', async () => {
-      service.remove.mockRejectedValue(
-        new Error('Service error'),
-      );
+      service.remove.mockRejectedValue(new Error('Service error'));
 
-      await expect(
-        controller.remove('999'),
-      ).rejects.toThrow('Service error');
+      await expect(controller.remove('999')).rejects.toThrow('Service error');
     });
   });
 });

@@ -145,13 +145,9 @@ describe('QuizController', () => {
     });
 
     it('GET /api/quizzes - should propagate service errors', async () => {
-      quizService.findAll.mockRejectedValue(
-        new Error('Database error'),
-      );
+      quizService.findAll.mockRejectedValue(new Error('Database error'));
 
-      await expect(controller.findAll({})).rejects.toThrow(
-        'Database error',
-      );
+      await expect(controller.findAll({})).rejects.toThrow('Database error');
     });
   });
 
@@ -173,13 +169,9 @@ describe('QuizController', () => {
     });
 
     it('GET /api/quizzes/:id - should propagate service errors', async () => {
-      quizService.findOne.mockRejectedValue(
-        new Error('Quiz not found'),
-      );
+      quizService.findOne.mockRejectedValue(new Error('Quiz not found'));
 
-      await expect(controller.findOne('999')).rejects.toThrow(
-        'Quiz not found',
-      );
+      await expect(controller.findOne('999')).rejects.toThrow('Quiz not found');
     });
   });
 
@@ -208,18 +200,16 @@ describe('QuizController', () => {
     });
 
     it('POST /api/quizzes - should propagate service errors', async () => {
-      quizService.create.mockRejectedValue(
-        new Error('Creation error'),
-      );
+      quizService.create.mockRejectedValue(new Error('Creation error'));
 
       const createQuizDto = {
         formation_id: 'formation-1',
         titre: 'Quiz Backend',
       };
 
-      await expect(
-        controller.create(createQuizDto),
-      ).rejects.toThrow('Creation error');
+      await expect(controller.create(createQuizDto)).rejects.toThrow(
+        'Creation error',
+      );
     });
   });
 
@@ -243,24 +233,19 @@ describe('QuizController', () => {
       const result = await controller.update('1', updateQuizDto);
 
       expect(result).toEqual(updatedQuiz);
-      expect(quizService.update).toHaveBeenCalledWith(
-        '1',
-        updateQuizDto,
-      );
+      expect(quizService.update).toHaveBeenCalledWith('1', updateQuizDto);
     });
 
     it('PUT /api/quizzes/:id - should propagate service errors', async () => {
-      quizService.update.mockRejectedValue(
-        new Error('Update error'),
-      );
+      quizService.update.mockRejectedValue(new Error('Update error'));
 
       const updateQuizDto = {
         titre: 'Quiz Updated',
       };
 
-      await expect(
-        controller.update('999', updateQuizDto),
-      ).rejects.toThrow('Update error');
+      await expect(controller.update('999', updateQuizDto)).rejects.toThrow(
+        'Update error',
+      );
     });
   });
 
@@ -279,13 +264,9 @@ describe('QuizController', () => {
     });
 
     it('DELETE /api/quizzes/:id - should propagate service errors', async () => {
-      quizService.remove.mockRejectedValue(
-        new Error('Delete error'),
-      );
+      quizService.remove.mockRejectedValue(new Error('Delete error'));
 
-      await expect(
-        controller.remove('999'),
-      ).rejects.toThrow('Delete error');
+      await expect(controller.remove('999')).rejects.toThrow('Delete error');
     });
   });
 });

@@ -51,9 +51,7 @@ describe('EnrollmentsController', () => {
 
       service.findAll.mockResolvedValue(result);
 
-      expect(
-        await controller.findAll({}),
-      ).toEqual(result);
+      expect(await controller.findAll({})).toEqual(result);
 
       expect(service.findAll).toHaveBeenCalledWith({});
     });
@@ -73,9 +71,7 @@ describe('EnrollmentsController', () => {
 
       service.findAll.mockResolvedValue(result);
 
-      expect(
-        await controller.findAll(filter),
-      ).toEqual(result);
+      expect(await controller.findAll(filter)).toEqual(result);
 
       expect(service.findAll).toHaveBeenCalledWith(filter);
     });
@@ -157,9 +153,7 @@ describe('EnrollmentsController', () => {
 
       service.findAll.mockRejectedValue(error);
 
-      await expect(
-        controller.findAll({}),
-      ).rejects.toThrow('Database error');
+      await expect(controller.findAll({})).rejects.toThrow('Database error');
     });
   });
 
@@ -182,13 +176,11 @@ describe('EnrollmentsController', () => {
     });
 
     it('should propagate service errors', async () => {
-      service.findOne.mockRejectedValue(
-        new Error('Enrollment not found'),
-      );
+      service.findOne.mockRejectedValue(new Error('Enrollment not found'));
 
-      await expect(
-        controller.findOne('999'),
-      ).rejects.toThrow('Enrollment not found');
+      await expect(controller.findOne('999')).rejects.toThrow(
+        'Enrollment not found',
+      );
     });
   });
 
@@ -221,13 +213,11 @@ describe('EnrollmentsController', () => {
         date_inscription: new Date().toISOString(),
       };
 
-      service.create.mockRejectedValue(
-        new Error('Enrollment already exists'),
-      );
+      service.create.mockRejectedValue(new Error('Enrollment already exists'));
 
-      await expect(
-        controller.create(dto),
-      ).rejects.toThrow('Enrollment already exists');
+      await expect(controller.create(dto)).rejects.toThrow(
+        'Enrollment already exists',
+      );
     });
   });
 
@@ -250,16 +240,11 @@ describe('EnrollmentsController', () => {
 
       expect(result).toEqual(enrollment);
 
-      expect(service.update).toHaveBeenCalledWith(
-        '1',
-        dto,
-      );
+      expect(service.update).toHaveBeenCalledWith('1', dto);
     });
 
     it('should propagate service errors', async () => {
-      service.update.mockRejectedValue(
-        new Error('Enrollment not found'),
-      );
+      service.update.mockRejectedValue(new Error('Enrollment not found'));
 
       await expect(
         controller.update('999', {
@@ -277,21 +262,17 @@ describe('EnrollmentsController', () => {
 
       service.remove.mockResolvedValue(result);
 
-      expect(
-        await controller.remove('1'),
-      ).toEqual(result);
+      expect(await controller.remove('1')).toEqual(result);
 
       expect(service.remove).toHaveBeenCalledWith('1');
     });
 
     it('should propagate service errors', async () => {
-      service.remove.mockRejectedValue(
-        new Error('Enrollment not found'),
-      );
+      service.remove.mockRejectedValue(new Error('Enrollment not found'));
 
-      await expect(
-        controller.remove('999'),
-      ).rejects.toThrow('Enrollment not found');
+      await expect(controller.remove('999')).rejects.toThrow(
+        'Enrollment not found',
+      );
     });
   });
 });

@@ -18,12 +18,17 @@ export class ReponseQuestionDto {
   @IsOptional()
   @IsArray()
   @IsUUID('all', { each: true })
-  @ApiPropertyOptional({ type: [String], example: ['c9cae2a9-3553-45c9-9d7a-1c7f3a41a291'] })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['c9cae2a9-3553-45c9-9d7a-1c7f3a41a291'],
+  })
   answer_ids?: string[];
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ example: 'Une API REST expose des ressources par HTTP.' })
+  @ApiPropertyOptional({
+    example: 'Une API REST expose des ressources par HTTP.',
+  })
   texte_libre?: string;
 }
 
@@ -46,21 +51,25 @@ export class SubmitQuizAttemptDto {
 export class CreateFormationDtoExample {
   @ApiProperty({ example: 'Développement backend avec NestJS' })
   titre: string;
- 
+
   @ApiPropertyOptional({
-    example: 'Concevoir des API robustes et modulaires avec NestJS, TypeORM et une architecture propre.',
+    example:
+      'Concevoir des API robustes et modulaires avec NestJS, TypeORM et une architecture propre.',
   })
   description?: string;
- 
+
   @ApiPropertyOptional({ example: 'Backend' })
   categorie?: string;
- 
-  @ApiPropertyOptional({ example: 'Intermédiaire', enum: ['Débutant', 'Intermédiaire', 'Avancé'] })
+
+  @ApiPropertyOptional({
+    example: 'Intermédiaire',
+    enum: ['Débutant', 'Intermédiaire', 'Avancé'],
+  })
   niveau?: string;
- 
+
   @ApiPropertyOptional({ example: 100, description: 'Durée en minutes' })
   duree?: number;
- 
+
   @ApiPropertyOptional({ example: 'active' })
   statut?: string;
 }

@@ -59,6 +59,7 @@ export function FormationCatalog({ onSelect, searchQuery = '' }: { onSelect: (fo
   const [search, setSearch] = useState('');
   const [categorie, setCategorie] = useState('');
   const [niveau, setNiveau] = useState('');
+  const [modalite, setModalite] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 6;
 
@@ -68,8 +69,8 @@ export function FormationCatalog({ onSelect, searchQuery = '' }: { onSelect: (fo
   }, [searchQuery]);
 
   const filters: FormationFilters = useMemo(
-    () => ({ categorie: categorie || undefined, niveau: niveau || undefined, limit: 50, offset: 0 }),
-    [categorie, niveau],
+    () => ({ categorie: categorie || undefined, niveau: niveau || undefined, modalite: modalite || undefined, limit: 50, offset: 0 }),
+    [categorie, niveau, modalite],
   );
 
   // Récupère la liste complète (non filtrée) une seule fois, pour construire
@@ -124,7 +125,7 @@ export function FormationCatalog({ onSelect, searchQuery = '' }: { onSelect: (fo
       </div>
 
       {/* Barre de filtres */}
-      <div className="mb-5 grid gap-2 rounded-xl border border-ardoise/12 bg-white p-3 lg:grid-cols-[minmax(220px,1fr)_190px_155px]" role="search">
+      <div className="mb-5 grid gap-2 rounded-xl border border-ardoise/12 bg-white p-3 lg:grid-cols-[minmax(220px,1fr)_190px_155px_190px]" role="search">
         <label className="sr-only" htmlFor="recherche-formation">
           Rechercher une formation
         </label>
@@ -163,6 +164,17 @@ export function FormationCatalog({ onSelect, searchQuery = '' }: { onSelect: (fo
               {n}
             </option>
           ))}
+        </select>
+
+        <select
+          value={modalite}
+          onChange={(e) => { setModalite(e.target.value); setPage(1); }}
+          aria-label="Filtrer par modalité"
+          className="font-body rounded-lg border border-ardoise/12 bg-white px-3 py-2.5 text-sm text-encre focus-visible:ring-2 focus-visible:ring-sauge"
+        >
+          <option value="">Toutes les modalités</option>
+          <option value="presentiel">Présentiel</option>
+          <option value="e_learning">E-learning</option>
         </select>
       </div>
 

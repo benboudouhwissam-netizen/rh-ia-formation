@@ -15,13 +15,7 @@ export class QuizResultsService {
   ) {}
 
   async findAll(filters: FilterQuizResultDto) {
-    const {
-      quiz_id,
-      utilisateur_id,
-      reussi,
-      limit = 10,
-      offset = 0,
-    } = filters;
+    const { quiz_id, utilisateur_id, reussi, limit = 10, offset = 0 } = filters;
 
     const where: any = {};
 
@@ -66,9 +60,7 @@ export class QuizResultsService {
     });
 
     if (!result) {
-      throw new NotFoundException(
-        `Quiz result with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Quiz result with ID ${id} not found`);
     }
 
     return result;
@@ -80,10 +72,7 @@ export class QuizResultsService {
     return this.repository.save(result);
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateQuizResultDto,
-  ) {
+  async update(id: string, updateDto: UpdateQuizResultDto) {
     const result = await this.findOne(id);
 
     Object.assign(result, updateDto);

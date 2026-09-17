@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
@@ -56,14 +53,13 @@ export class CompetencesService {
 
   async create(createCompetenceDto: CreateCompetenceDto) {
     try {
-
       const embedding = await this.aiService.generateEmbedding(
         `${createCompetenceDto.nom} ${createCompetenceDto.description ?? ''}`,
       );
 
       const competence = this.competenceRepository.create({
         ...createCompetenceDto,
-        embedding: embedding as any,
+        embedding: embedding,
       });
 
       const result = await this.competenceRepository.save(competence);
@@ -112,26 +108,25 @@ export class CompetencesService {
   }
 
   async generateMissingEmbeddings() {
-  const competences = await this.competenceRepository.find({
-    where: {
-      embedding: IsNull(),
-    },
-  });
+    const competences = await this.competenceRepository.find({
+      where: {
+        embedding: IsNull(),
+      },
+    });
 
-  for (const competence of competences) {
-    const embedding = await this.aiService.generateEmbedding(
-      `${competence.nom} ${competence.description ?? ''}`,
-    );
+    for (const competence of competences) {
+      const embedding = await this.aiService.generateEmbedding(
+        `${competence.nom} ${competence.description ?? ''}`,
+      );
 
-    competence.embedding = embedding as any;
+      competence.embedding = embedding;
 
-    await this.competenceRepository.save(competence);
+      await this.competenceRepository.save(competence);
+    }
 
+    return {
+      count: competences.length,
+      message: 'Embeddings manquants générés avec succès',
+    };
   }
-
-  return {
-    count: competences.length,
-    message: 'Embeddings manquants générés avec succès',
-  };
-}
 }

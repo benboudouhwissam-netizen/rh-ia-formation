@@ -30,6 +30,7 @@ import { FormationCompetence } from '../formations/entities/formation-competence
 import { AiModule } from '../ai/ai.module';
 import { StorageModule } from '../storage/storage.module';
 import { EmployeeAccount } from '../auth/entities/employee-account.entity';
+import { SessionAuthGuard } from '../auth/guards/session-auth.guard';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { EmployeeAccount } from '../auth/entities/employee-account.entity';
     EmployeeCompetencesService,
     CompetenceMatricesService,
     CompetenceGapService,
+    SessionAuthGuard,
     CertificationsService,
   ],
 })

@@ -189,9 +189,7 @@ describe('CompetencesController - GET /api/competences', () => {
   it('GET /api/competences/:id - should propagate service errors', async () => {
     const id = '999';
 
-    const error = new Error(
-      "Compétence avec l'id 999 introuvable",
-    );
+    const error = new Error("Compétence avec l'id 999 introuvable");
 
     mockCompetencesService.findOne.mockRejectedValue(error);
 
@@ -244,15 +242,11 @@ describe('CompetencesController - GET /api/competences', () => {
       niveau: 'Avancé',
     };
 
-    const error = new Error(
-      "Compétence avec l'id 999 introuvable",
-    );
+    const error = new Error("Compétence avec l'id 999 introuvable");
 
     mockCompetencesService.update.mockRejectedValue(error);
 
-    await expect(
-      controller.update(id, updateData),
-    ).rejects.toThrow(
+    await expect(controller.update(id, updateData)).rejects.toThrow(
       "Compétence avec l'id 999 introuvable",
     );
 
@@ -277,15 +271,11 @@ describe('CompetencesController - GET /api/competences', () => {
   it('DELETE /api/competences/:id - should propagate service errors', async () => {
     const id = '999';
 
-    const error = new Error(
-      "Compétence avec l'id 999 introuvable",
-    );
+    const error = new Error("Compétence avec l'id 999 introuvable");
 
     mockCompetencesService.remove.mockRejectedValue(error);
 
-    await expect(
-      controller.remove(id),
-    ).rejects.toThrow(
+    await expect(controller.remove(id)).rejects.toThrow(
       "Compétence avec l'id 999 introuvable",
     );
 
@@ -318,9 +308,7 @@ describe('CompetencesController - GET /api/competences', () => {
   it('GET /api/competences/search/similar - should propagate service errors', async () => {
     const query = 'Docker';
 
-    const error = new Error(
-      'Erreur lors de la recherche par similarité',
-    );
+    const error = new Error('Erreur lors de la recherche par similarité');
 
     mockCompetencesService.searchSimilar.mockRejectedValue(error);
 

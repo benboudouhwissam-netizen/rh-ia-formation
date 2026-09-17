@@ -29,11 +29,17 @@ export class CreateCertificationDto {
   @MaxLength(150)
   organisme?: string;
 
-  @ApiProperty({ example: '2026-01-15', description: 'Format ISO (YYYY-MM-DD)' })
+  @ApiProperty({
+    example: '2026-01-15',
+    description: 'Format ISO (YYYY-MM-DD)',
+  })
   @IsDateString()
   date_obtention: string;
 
-  @ApiPropertyOptional({ example: '2029-01-15', description: 'Format ISO (YYYY-MM-DD)' })
+  @ApiPropertyOptional({
+    example: '2029-01-15',
+    description: 'Format ISO (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString()
   date_expiration?: string;

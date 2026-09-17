@@ -12,12 +12,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 
-import {
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CertificationsService } from './certifications.service';
 
@@ -28,20 +23,14 @@ import { FilterCertificationDto } from '../dto/filter-certification.dto';
 @ApiTags('certifications')
 @Controller('certifications')
 export class CertificationsController {
-  constructor(
-    private readonly certificationsService: CertificationsService,
-  ) {}
+  constructor(private readonly certificationsService: CertificationsService) {}
 
   @Get()
   @ApiOperation({
     summary: 'Lister les certifications avec filtres',
   })
-  findAll(
-    @Query() filterDto: FilterCertificationDto,
-  ) {
-    return this.certificationsService.findAll(
-      filterDto,
-    );
+  findAll(@Query() filterDto: FilterCertificationDto) {
+    return this.certificationsService.findAll(filterDto);
   }
 
   @Get('utilisateur/:utilisateurId')
@@ -52,12 +41,8 @@ export class CertificationsController {
     name: 'utilisateurId',
     description: "UUID de l'employé",
   })
-  findByUtilisateur(
-    @Param('utilisateurId') utilisateurId: string,
-  ) {
-    return this.certificationsService.findByUtilisateur(
-      utilisateurId,
-    );
+  findByUtilisateur(@Param('utilisateurId') utilisateurId: string) {
+    return this.certificationsService.findByUtilisateur(utilisateurId);
   }
 
   @Get(':id')
@@ -79,22 +64,23 @@ export class CertificationsController {
   @Get(':id/download')
   @Header('Content-Type', 'application/pdf')
   download(@Param('id') id: string, @Res() response: Response) {
-    return this.certificationsService.generatePdf(id).then(({ content, fileName }) => {
-      response.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-      response.send(content);
-    });
+    return this.certificationsService
+      .generatePdf(id)
+      .then(({ content, fileName }) => {
+        response.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${fileName}"`,
+        );
+        response.send(content);
+      });
   }
 
   @Post()
   @ApiOperation({
     summary: 'Créer une certification',
   })
-  create(
-    @Body() createDto: CreateCertificationDto,
-  ) {
-    return this.certificationsService.create(
-      createDto,
-    );
+  create(@Body() createDto: CreateCertificationDto) {
+    return this.certificationsService.create(createDto);
   }
 
   @Put(':id')
@@ -105,14 +91,8 @@ export class CertificationsController {
     name: 'id',
     description: 'UUID de la certification',
   })
-  update(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateCertificationDto,
-  ) {
-    return this.certificationsService.update(
-      id,
-      updateDto,
-    );
+  update(@Param('id') id: string, @Body() updateDto: UpdateCertificationDto) {
+    return this.certificationsService.update(id, updateDto);
   }
 
   @Delete(':id')

@@ -34,20 +34,17 @@ describe('QuizQuestionsService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    const module: TestingModule =
-      await Test.createTestingModule({
-        providers: [
-          QuizQuestionsService,
-          {
-            provide: getRepositoryToken(QuizQuestion),
-            useValue: repository,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        QuizQuestionsService,
+        {
+          provide: getRepositoryToken(QuizQuestion),
+          useValue: repository,
+        },
+      ],
+    }).compile();
 
-    service = module.get<QuizQuestionsService>(
-      QuizQuestionsService,
-    );
+    service = module.get<QuizQuestionsService>(QuizQuestionsService);
   });
 
   it('should be defined', () => {
@@ -60,10 +57,7 @@ describe('QuizQuestionsService', () => {
 
   describe('findAll', () => {
     it('should return all quiz questions', async () => {
-      repository.findAndCount.mockResolvedValue([
-        questions,
-        2,
-      ]);
+      repository.findAndCount.mockResolvedValue([questions, 2]);
 
       const result = await service.findAll({});
 
@@ -88,10 +82,7 @@ describe('QuizQuestionsService', () => {
     });
 
     it('should apply pagination', async () => {
-      repository.findAndCount.mockResolvedValue([
-        questions,
-        20,
-      ]);
+      repository.findAndCount.mockResolvedValue([questions, 20]);
 
       const result = await service.findAll({
         limit: 5,
@@ -115,10 +106,7 @@ describe('QuizQuestionsService', () => {
     });
 
     it('should filter by quiz_id', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [questions[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[questions[0]], 1]);
 
       await service.findAll({
         quiz_id: 'quiz-123',
@@ -140,10 +128,7 @@ describe('QuizQuestionsService', () => {
     });
 
     it('should filter by type', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [questions[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[questions[0]], 1]);
 
       await service.findAll({
         type: 'multiple_choice',
@@ -165,10 +150,7 @@ describe('QuizQuestionsService', () => {
     });
 
     it('should apply multiple filters', async () => {
-      repository.findAndCount.mockResolvedValue([
-        [questions[0]],
-        1,
-      ]);
+      repository.findAndCount.mockResolvedValue([[questions[0]], 1]);
 
       await service.findAll({
         quiz_id: 'quiz-123',
@@ -200,9 +182,7 @@ describe('QuizQuestionsService', () => {
 
   describe('findOne', () => {
     it('should return one quiz question', async () => {
-      repository.findOne.mockResolvedValue(
-        questions[0],
-      );
+      repository.findOne.mockResolvedValue(questions[0]);
 
       const result = await service.findOne('1');
 
@@ -221,9 +201,7 @@ describe('QuizQuestionsService', () => {
     it('should throw an error when quiz question does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.findOne('999'),
-      ).rejects.toThrow(
+      await expect(service.findOne('999')).rejects.toThrow(
         'Quiz question with ID 999 not found',
       );
     });
@@ -247,29 +225,17 @@ describe('QuizQuestionsService', () => {
         ...createDto,
       };
 
-      repository.create.mockReturnValue(
-        createdQuestion,
-      );
+      repository.create.mockReturnValue(createdQuestion);
 
-      repository.save.mockResolvedValue(
-        createdQuestion,
-      );
+      repository.save.mockResolvedValue(createdQuestion);
 
-      const result = await service.create(
-        createDto,
-      );
+      const result = await service.create(createDto);
 
-      expect(result).toEqual(
-        createdQuestion,
-      );
+      expect(result).toEqual(createdQuestion);
 
-      expect(repository.create).toHaveBeenCalledWith(
-        createDto,
-      );
+      expect(repository.create).toHaveBeenCalledWith(createDto);
 
-      expect(repository.save).toHaveBeenCalledWith(
-        createdQuestion,
-      );
+      expect(repository.save).toHaveBeenCalledWith(createdQuestion);
     });
 
     it('should propagate repository errors', async () => {
@@ -280,23 +246,13 @@ describe('QuizQuestionsService', () => {
         ordre: 3,
       };
 
-      const error = new Error(
-        'Database error',
-      );
+      const error = new Error('Database error');
 
-      repository.create.mockReturnValue(
-        createDto,
-      );
+      repository.create.mockReturnValue(createDto);
 
-      repository.save.mockRejectedValue(
-        error,
-      );
+      repository.save.mockRejectedValue(error);
 
-      await expect(
-        service.create(createDto),
-      ).rejects.toThrow(
-        'Database error',
-      );
+      await expect(service.create(createDto)).rejects.toThrow('Database error');
     });
   });
 
@@ -321,26 +277,15 @@ describe('QuizQuestionsService', () => {
         ...updateDto,
       };
 
-      repository.findOne.mockResolvedValue(
-        question,
-      );
+      repository.findOne.mockResolvedValue(question);
 
-      repository.save.mockResolvedValue(
-        updatedQuestion,
-      );
+      repository.save.mockResolvedValue(updatedQuestion);
 
-      const result = await service.update(
-        '1',
-        updateDto,
-      );
+      const result = await service.update('1', updateDto);
 
-      expect(result).toEqual(
-        updatedQuestion,
-      );
+      expect(result).toEqual(updatedQuestion);
 
-      expect(repository.save).toHaveBeenCalledWith(
-        updatedQuestion,
-      );
+      expect(repository.save).toHaveBeenCalledWith(updatedQuestion);
     });
 
     it('should throw an error when quiz question does not exist', async () => {
@@ -350,9 +295,7 @@ describe('QuizQuestionsService', () => {
         service.update('999', {
           question: 'Question modifiée ?',
         }),
-      ).rejects.toThrow(
-        'Quiz question with ID 999 not found',
-      );
+      ).rejects.toThrow('Quiz question with ID 999 not found');
     });
   });
 
@@ -366,34 +309,23 @@ describe('QuizQuestionsService', () => {
         ...questions[0],
       };
 
-      repository.findOne.mockResolvedValue(
-        question,
-      );
+      repository.findOne.mockResolvedValue(question);
 
-      repository.remove.mockResolvedValue(
-        question,
-      );
+      repository.remove.mockResolvedValue(question);
 
       const result = await service.remove('1');
 
       expect(result).toEqual({
-        message:
-          'Quiz question deleted successfully',
+        message: 'Quiz question deleted successfully',
       });
 
-      expect(
-        repository.remove,
-      ).toHaveBeenCalledWith(
-        question,
-      );
+      expect(repository.remove).toHaveBeenCalledWith(question);
     });
 
     it('should throw an error when quiz question does not exist', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.remove('999'),
-      ).rejects.toThrow(
+      await expect(service.remove('999')).rejects.toThrow(
         'Quiz question with ID 999 not found',
       );
     });

@@ -16,6 +16,7 @@ export interface FormationFilters {
   categorie?: string;
   niveau?: string;
   statut?: string;
+  modalite?: 'presentiel' | 'e_learning' | string;
   limit?: number;
   offset?: number;
 }
@@ -43,7 +44,7 @@ async function apiGet<T>(path: string, params?: Record<string, string | number |
       if (value !== undefined && value !== '') url.searchParams.set(key, String(value));
     });
   }
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), { headers: authHeaders() });
   if (!res.ok) throw new Error(`Erreur API ${res.status} sur ${path}`);
   return res.json();
 }
@@ -51,7 +52,7 @@ async function apiGet<T>(path: string, params?: Record<string, string | number |
 async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error(`Erreur API ${res.status} sur ${path}`);
@@ -61,12 +62,36 @@ async function apiPost<T>(path: string, body?: unknown): Promise<T> {
 async function apiPut<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error(`Erreur API ${res.status} sur ${path}`);
   return res.json();
 }
+
+function authHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem('rh-ia-employee-session');
+    const token = raw ? (JSON.parse(raw) as { token?: string }).token : undefined;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
+export type ChatbotResponse = {
+  message: string;
+  actions: { label: string; url: string }[];
+};
+
+export const chatbotApi = {
+  ask: (utilisateurId: string | undefined, message: string) =>
+    apiPost<ChatbotResponse>('/chatbot/message', {
+      ...(utilisateurId ? { utilisateur_id: utilisateurId } : {}),
+      message,
+    }),
+};
 
 export interface TrainingSession {
   id: string;

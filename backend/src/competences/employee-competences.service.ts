@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,24 +21,22 @@ export class EmployeeCompetencesService {
   async findByUtilisateur(
     utilisateurId: string,
   ): Promise<EmployeeCompetence[]> {
-    const competences =
-      await this.employeeCompetenceRepository.find({
-        where: {
-          utilisateur_id: utilisateurId,
-        },
-        order: {
-          date_evaluation: 'DESC',
-        },
-      });
+    const competences = await this.employeeCompetenceRepository.find({
+      where: {
+        utilisateur_id: utilisateurId,
+      },
+      order: {
+        date_evaluation: 'DESC',
+      },
+    });
 
     return competences;
   }
 
   async findOne(id: string): Promise<EmployeeCompetence> {
-    const competence =
-      await this.employeeCompetenceRepository.findOne({
-        where: { id },
-      });
+    const competence = await this.employeeCompetenceRepository.findOne({
+      where: { id },
+    });
 
     if (!competence) {
       throw new NotFoundException(
@@ -73,7 +68,11 @@ export class EmployeeCompetencesService {
       utilisateur_id: saved.utilisateur_id,
       type: 'competence_mise_a_jour',
       reference_id: null,
-      payload: { competence_id: saved.competence_id, niveau: saved.niveau, source: saved.source },
+      payload: {
+        competence_id: saved.competence_id,
+        niveau: saved.niveau,
+        source: saved.source,
+      },
     });
     return saved;
   }
@@ -88,7 +87,11 @@ export class EmployeeCompetencesService {
     utilisateurs: string[];
     employes: { id: string; nom_complet: string }[];
     competences: { id: string; nom: string }[];
-    cellules: { utilisateur_id: string; competence_id: string; niveau: number }[];
+    cellules: {
+      utilisateur_id: string;
+      competence_id: string;
+      niveau: number;
+    }[];
   }> {
     const rows = await this.employeeCompetenceRepository.find({
       relations: { competence: true },
@@ -102,39 +105,63 @@ export class EmployeeCompetencesService {
       order: { nom_complet: 'ASC', id: 'ASC' },
     });
     const rowCounts = new Map<string, number>();
-    rows.forEach((row) => rowCounts.set(row.utilisateur_id, (rowCounts.get(row.utilisateur_id) ?? 0) + 1));
+    rows.forEach((row) =>
+      rowCounts.set(
+        row.utilisateur_id,
+        (rowCounts.get(row.utilisateur_id) ?? 0) + 1,
+      ),
+    );
     const accountByName = new Map<string, EmployeeAccount>();
     for (const account of accounts) {
       const key = account.nom_complet.trim().toLocaleLowerCase();
       const current = accountByName.get(key);
-      if (!current || (rowCounts.get(account.id) ?? 0) > (rowCounts.get(current.id) ?? 0)) {
+      if (
+        !current ||
+        (rowCounts.get(account.id) ?? 0) > (rowCounts.get(current.id) ?? 0)
+      ) {
         accountByName.set(key, account);
       }
     }
-    const canonicalAccounts = Array.from(accountByName.values()).filter((account) => {
-      const name = account.nom_complet.trim();
-      return !/^test\b/i.test(name) && !/^collaborateur interne$/i.test(name);
-    });
+    const canonicalAccounts = Array.from(accountByName.values()).filter(
+      (account) => {
+        const name = account.nom_complet.trim();
+        return !/^test\b/i.test(name) && !/^collaborateur interne$/i.test(name);
+      },
+    );
     const utilisateurs = canonicalAccounts.map((account) => account.id);
-    const employes = canonicalAccounts.map((account) => ({ id: account.id, nom_complet: account.nom_complet }));
+    const employes = canonicalAccounts.map((account) => ({
+      id: account.id,
+      nom_complet: account.nom_complet,
+    }));
     const canonicalIds = new Set(utilisateurs);
 
     const competencesMap = new Map<string, string>();
-    rows.filter((r) => canonicalIds.has(r.utilisateur_id)).forEach((r) => competencesMap.set(r.competence_id, r.competence?.nom ?? r.competence_id));
-    const competences = Array.from(competencesMap.entries()).map(([id, nom]) => ({ id, nom }));
+    rows
+      .filter((r) => canonicalIds.has(r.utilisateur_id))
+      .forEach((r) =>
+        competencesMap.set(
+          r.competence_id,
+          r.competence?.nom ?? r.competence_id,
+        ),
+      );
+    const competences = Array.from(competencesMap.entries()).map(
+      ([id, nom]) => ({ id, nom }),
+    );
 
-    const cellules = rows.filter((r) => canonicalIds.has(r.utilisateur_id)).map((r) => ({
-      utilisateur_id: r.utilisateur_id,
-      competence_id: r.competence_id,
-      niveau: r.niveau,
-    }));
+    const cellules = rows
+      .filter((r) => canonicalIds.has(r.utilisateur_id))
+      .map((r) => ({
+        utilisateur_id: r.utilisateur_id,
+        competence_id: r.competence_id,
+        niveau: r.niveau,
+      }));
 
     return { utilisateurs, employes, competences, cellules };
   }
 
   async getTopExperts(limit = 5) {
-  const classement = await this.employeeCompetenceRepository.query(
-    `
+    const classement = await this.employeeCompetenceRepository.query(
+      `
     SELECT competence_id, competence_nom, utilisateur_id, utilisateur_nom, niveau, rang
     FROM (
       SELECT
@@ -152,21 +179,23 @@ export class EmployeeCompetencesService {
     WHERE rang <= $1
     ORDER BY competence_nom, rang
     `,
-    [limit],
-  );
+      [limit],
+    );
 
-  const competenceIds = [...new Set(classement.map((r: any) => r.competence_id))];
+    const competenceIds = [
+      ...new Set(classement.map((r: any) => r.competence_id)),
+    ];
 
-  const certifications = competenceIds.length
-    ? await this.employeeCompetenceRepository.query(
-        `SELECT utilisateur_id, competence_id, nom_certification, organisme, date_obtention
+    const certifications = competenceIds.length
+      ? await this.employeeCompetenceRepository.query(
+          `SELECT utilisateur_id, competence_id, nom_certification, organisme, date_obtention
          FROM certifications
          WHERE competence_id = ANY($1::uuid[])`,
-        [competenceIds],
-      )
-    : [];
+          [competenceIds],
+        )
+      : [];
 
-  const parCompetence = new Map<string, any>();
+    const parCompetence = new Map<string, any>();
     for (const row of classement) {
       if (!parCompetence.has(row.competence_id)) {
         parCompetence.set(row.competence_id, {
@@ -176,7 +205,9 @@ export class EmployeeCompetencesService {
         });
       }
       const certifs = certifications.filter(
-        (c: any) => c.utilisateur_id === row.utilisateur_id && c.competence_id === row.competence_id,
+        (c: any) =>
+          c.utilisateur_id === row.utilisateur_id &&
+          c.competence_id === row.competence_id,
       );
       parCompetence.get(row.competence_id).experts.push({
         utilisateur_id: row.utilisateur_id,

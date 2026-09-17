@@ -10,7 +10,12 @@ export class LearningTasksService {
     private readonly taskRepository: Repository<LearningTask>,
   ) {}
 
-  async create(input: Pick<LearningTask, 'utilisateur_id' | 'type' | 'reference_id' | 'message' | 'payload'>) {
+  async create(
+    input: Pick<
+      LearningTask,
+      'utilisateur_id' | 'type' | 'reference_id' | 'message' | 'payload'
+    >,
+  ) {
     return this.taskRepository.save(this.taskRepository.create(input));
   }
 

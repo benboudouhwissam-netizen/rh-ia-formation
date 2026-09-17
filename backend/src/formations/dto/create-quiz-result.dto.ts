@@ -1,4 +1,11 @@
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsUUID, Matches } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Matches,
+} from 'class-validator';
 
 export class CreateQuizResultDto {
   @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)

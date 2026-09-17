@@ -15,12 +15,7 @@ export class QuizAnswersService {
   ) {}
 
   async findAll(filterDto: FilterQuizAnswerDto) {
-    const {
-      question_id,
-      est_correcte,
-      limit = 10,
-      offset = 0,
-    } = filterDto;
+    const { question_id, est_correcte, limit = 10, offset = 0 } = filterDto;
 
     const where: any = {};
 
@@ -32,18 +27,17 @@ export class QuizAnswersService {
       where.est_correcte = est_correcte;
     }
 
-    const [data, total] =
-      await this.quizAnswerRepository.findAndCount({
-        where,
-        relations: {
-          question: true,
-        },
-        order: {
-          ordre: 'ASC',
-        },
-        take: limit,
-        skip: offset,
-      });
+    const [data, total] = await this.quizAnswerRepository.findAndCount({
+      where,
+      relations: {
+        question: true,
+      },
+      order: {
+        ordre: 'ASC',
+      },
+      take: limit,
+      skip: offset,
+    });
 
     return {
       data,
@@ -54,34 +48,27 @@ export class QuizAnswersService {
   }
 
   async findOne(id: string) {
-    const quizAnswer =
-      await this.quizAnswerRepository.findOne({
-        where: { id },
-        relations: {
-          question: true,
-        },
-      });
+    const quizAnswer = await this.quizAnswerRepository.findOne({
+      where: { id },
+      relations: {
+        question: true,
+      },
+    });
 
     if (!quizAnswer) {
-      throw new NotFoundException(
-        `Quiz answer with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Quiz answer with ID ${id} not found`);
     }
 
     return quizAnswer;
   }
 
   async create(createDto: CreateQuizAnswerDto) {
-    const quizAnswer =
-      this.quizAnswerRepository.create(createDto);
+    const quizAnswer = this.quizAnswerRepository.create(createDto);
 
     return this.quizAnswerRepository.save(quizAnswer);
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateQuizAnswerDto,
-  ) {
+  async update(id: string, updateDto: UpdateQuizAnswerDto) {
     const quizAnswer = await this.findOne(id);
 
     Object.assign(quizAnswer, updateDto);

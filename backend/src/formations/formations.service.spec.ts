@@ -37,36 +37,33 @@ describe('FormationsService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        providers: [
-          FormationsService,
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        FormationsService,
 
-          {
-            provide: getRepositoryToken(Formation),
-            useValue: mockRepository,
-          },
+        {
+          provide: getRepositoryToken(Formation),
+          useValue: mockRepository,
+        },
 
-          {
-            provide: getRepositoryToken(Competence),
-            useValue: mockCompetenceRepository,
-          },
+        {
+          provide: getRepositoryToken(Competence),
+          useValue: mockCompetenceRepository,
+        },
 
-          {
-            provide: getRepositoryToken(FormationCompetence),
-            useValue: mockFormationCompetenceRepository,
-          },
+        {
+          provide: getRepositoryToken(FormationCompetence),
+          useValue: mockFormationCompetenceRepository,
+        },
 
-          {
-            provide: AiService,
-            useValue: mockAiService,
-          },
-        ],
-      }).compile();
+        {
+          provide: AiService,
+          useValue: mockAiService,
+        },
+      ],
+    }).compile();
 
-    service = module.get<FormationsService>(
-      FormationsService,
-    );
+    service = module.get<FormationsService>(FormationsService);
 
     jest.clearAllMocks();
   });
@@ -310,15 +307,11 @@ describe('FormationsService', () => {
 
     expect(response).toEqual(formation);
 
-    expect(mockRepository.create).toHaveBeenCalledWith(
-      createData,
-    );
+    expect(mockRepository.create).toHaveBeenCalledWith(createData);
 
     expect(mockRepository.create).toHaveBeenCalledTimes(1);
 
-    expect(mockRepository.save).toHaveBeenCalledWith(
-      formation,
-    );
+    expect(mockRepository.save).toHaveBeenCalledWith(formation);
 
     expect(mockRepository.save).toHaveBeenCalledTimes(1);
   });
@@ -332,16 +325,12 @@ describe('FormationsService', () => {
       statut: 'active',
     };
 
-    const error = new Error(
-      'Erreur lors de la création de la formation',
-    );
+    const error = new Error('Erreur lors de la création de la formation');
 
     mockRepository.create.mockReturnValue(createData);
     mockRepository.save.mockRejectedValue(error);
 
-    await expect(
-      service.create(createData),
-    ).rejects.toThrow(
+    await expect(service.create(createData)).rejects.toThrow(
       'Erreur lors de la création de la formation',
     );
 
@@ -371,10 +360,7 @@ describe('FormationsService', () => {
       ...updateData,
     });
 
-    const response = await service.update(
-      id,
-      updateData,
-    );
+    const response = await service.update(id, updateData);
 
     expect(response).toEqual({
       ...formation,
@@ -387,9 +373,7 @@ describe('FormationsService', () => {
       },
     });
 
-    expect(mockRepository.save).toHaveBeenCalledWith(
-      formation,
-    );
+    expect(mockRepository.save).toHaveBeenCalledWith(formation);
   });
 
   it('update - should throw an error when formation does not exist', async () => {
@@ -401,9 +385,7 @@ describe('FormationsService', () => {
       service.update(id, {
         titre: 'Nouvelle formation',
       }),
-    ).rejects.toThrow(
-      "Formation avec l'id 999 introuvable",
-    );
+    ).rejects.toThrow("Formation avec l'id 999 introuvable");
 
     expect(mockRepository.save).not.toHaveBeenCalled();
   });
@@ -430,9 +412,7 @@ describe('FormationsService', () => {
       },
     });
 
-    expect(mockRepository.remove).toHaveBeenCalledWith(
-      formation,
-    );
+    expect(mockRepository.remove).toHaveBeenCalledWith(formation);
 
     expect(mockRepository.remove).toHaveBeenCalledTimes(1);
   });

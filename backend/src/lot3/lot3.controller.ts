@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PartialType } from '@nestjs/mapped-types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,21 +24,32 @@ class UpdateDocumentDto extends PartialType(CreateDocumentDto) {}
 @Controller('lot3')
 export class Lot3Controller {
   constructor(
-    @InjectRepository(Contract) private readonly contracts: Repository<Contract>,
+    @InjectRepository(Contract)
+    private readonly contracts: Repository<Contract>,
     @InjectRepository(Diploma) private readonly diplomas: Repository<Diploma>,
-    @InjectRepository(Document) private readonly documents: Repository<Document>,
+    @InjectRepository(Document)
+    private readonly documents: Repository<Document>,
   ) {}
 
   @Get('contracts') listContracts(@Query('employee_id') employeeId: string) {
-    return this.contracts.find({ where: { employee_id: employeeId }, order: { start_date: 'DESC' } });
+    return this.contracts.find({
+      where: { employee_id: employeeId },
+      order: { start_date: 'DESC' },
+    });
   }
 
   @Get('diplomas') listDiplomas(@Query('employee_id') employeeId: string) {
-    return this.diplomas.find({ where: { employee_id: employeeId }, order: { year: 'DESC' } });
+    return this.diplomas.find({
+      where: { employee_id: employeeId },
+      order: { year: 'DESC' },
+    });
   }
 
   @Get('documents') listDocuments(@Query('employee_id') employeeId: string) {
-    return this.documents.find({ where: { employee_id: employeeId }, order: { created_at: 'DESC' } });
+    return this.documents.find({
+      where: { employee_id: employeeId },
+      order: { created_at: 'DESC' },
+    });
   }
 
   @Post('contracts') createContract(@Body() payload: CreateContractDto) {
@@ -45,15 +64,30 @@ export class Lot3Controller {
     return this.documents.save(this.documents.create(payload));
   }
 
-  @Patch('contracts/:id') updateContract(@Param('id') id: string, @Body() payload: UpdateContractDto) {
-    return this.contracts.preload({ id, ...payload }).then((entity) => entity ? this.contracts.save(entity) : null);
+  @Patch('contracts/:id') updateContract(
+    @Param('id') id: string,
+    @Body() payload: UpdateContractDto,
+  ) {
+    return this.contracts
+      .preload({ id, ...payload })
+      .then((entity) => (entity ? this.contracts.save(entity) : null));
   }
 
-  @Patch('diplomas/:id') updateDiploma(@Param('id') id: string, @Body() payload: UpdateDiplomaDto) {
-    return this.diplomas.preload({ id, ...payload }).then((entity) => entity ? this.diplomas.save(entity) : null);
+  @Patch('diplomas/:id') updateDiploma(
+    @Param('id') id: string,
+    @Body() payload: UpdateDiplomaDto,
+  ) {
+    return this.diplomas
+      .preload({ id, ...payload })
+      .then((entity) => (entity ? this.diplomas.save(entity) : null));
   }
 
-  @Patch('documents/:id') updateDocument(@Param('id') id: string, @Body() payload: UpdateDocumentDto) {
-    return this.documents.preload({ id, ...payload }).then((entity) => entity ? this.documents.save(entity) : null);
+  @Patch('documents/:id') updateDocument(
+    @Param('id') id: string,
+    @Body() payload: UpdateDocumentDto,
+  ) {
+    return this.documents
+      .preload({ id, ...payload })
+      .then((entity) => (entity ? this.documents.save(entity) : null));
   }
 }

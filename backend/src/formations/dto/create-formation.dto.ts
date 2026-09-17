@@ -1,9 +1,4 @@
-import {
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateFormationDto {
@@ -24,12 +19,18 @@ export class CreateFormationDto {
   categorie?: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ example: 'Intermédiaire', enum: ['Débutant', 'Intermédiaire', 'Avancé'] })
+  @ApiPropertyOptional({
+    example: 'Intermédiaire',
+    enum: ['Débutant', 'Intermédiaire', 'Avancé'],
+  })
   @IsString()
   niveau?: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ example: 'presentiel', enum: ['presentiel', 'e_learning'] })
+  @ApiPropertyOptional({
+    example: 'presentiel',
+    enum: ['presentiel', 'e_learning'],
+  })
   @IsString()
   modalite?: string;
 

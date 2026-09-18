@@ -26,7 +26,7 @@ const POSTS = [
   { id: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', label: 'Responsable RH' },
   { id: 'ffffffff-ffff-ffff-ffff-ffffffffffff', label: 'DevOps' },
 ];
-type Certification = { id: string; nom_certification: string; date_obtention: string };
+type Certification = { id: string; nom_certification: string; date_obtention: string; formation_id?: string | null };
 type Enrollment = { id: string; statut: string; training_session?: { formation?: { titre: string }; date_debut?: string } };
 type Contract = { id: string; type: string; status: string; start_date: string; end_date?: string; job_title?: string; salary?: number };
 type Diploma = { id: string; title: string; institution: string; field?: string; year?: number };
@@ -84,7 +84,23 @@ export default function ProfilPage() {
       fetch(`${API_URL}/lot3/contracts?employee_id=${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
       fetch(`${API_URL}/lot3/diplomas?employee_id=${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
       fetch(`${API_URL}/lot3/documents?employee_id=${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
-    ]).then(([certs, enrollmentResult, contractResult, diplomaResult, documentResult]) => { setCertifications(certs); setEnrollments(enrollmentResult.data ?? []); setContracts(contractResult); setDiplomas(diplomaResult); setDocuments(documentResult); }).catch(() => {});
+    ]).then(async ([certs, enrollmentResult, contractResult, diplomaResult, documentResult]) => {
+      const certifiedFormations = await Promise.all((certs as Certification[]).filter((cert) => cert.formation_id).map(async (cert) => {
+        try {
+          const response = await fetch(`${API_URL}/formations/${cert.formation_id}`, { headers: sessionHeaders() });
+          if (!response.ok) return null;
+          const formation = await response.json() as { titre?: string };
+          return { id: `cert-${cert.id}`, statut: 'terminee', training_session: { formation: { titre: formation.titre ?? cert.nom_certification }, date_debut: cert.date_obtention } } as Enrollment;
+        } catch {
+          return null;
+        }
+      }));
+      const existingTitles = new Set((enrollmentResult.data ?? []).map((item: Enrollment) => item.training_session?.formation?.titre));
+      const completed = certifiedFormations.filter((item): item is Enrollment => item !== null && !existingTitles.has(item.training_session?.formation?.titre));
+      setCertifications(certs);
+      setEnrollments([...(enrollmentResult.data ?? []), ...completed]);
+      setContracts(contractResult); setDiplomas(diplomaResult); setDocuments(documentResult);
+    }).catch(() => {});
   }, [employee, fillForm]);
   useEffect(() => {
     const refresh = () => window.location.reload();

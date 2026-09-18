@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../auth/AuthProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+function sessionHeaders(): Record<string, string> {
+  try {
+    const raw = window.localStorage.getItem('rh-ia-employee-session');
+    const token = raw ? (JSON.parse(raw) as { token?: string }).token : undefined;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
 type Enrollment = {
   id: string;
   statut: string;
@@ -22,14 +31,25 @@ export function MyFormations({ onClose }: { onClose: () => void }) {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   useEffect(() => {
     if (!employee) return;
-    fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=50`).then((r) => r.json()).then((data) => setEnrollments(data.data ?? [])).catch(() => setEnrollments([]));
-      fetch(`${API_URL}/certifications/utilisateur/${employee.id}`).then((r) => r.json()).then((data) => {
+    fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=50`, { headers: sessionHeaders() }).then((r) => r.json()).then((data) => setEnrollments((current) => [...(data.data ?? []), ...current.filter((item) => item.id.startsWith('cert-'))])).catch(() => setEnrollments([]));
+      fetch(`${API_URL}/certifications/utilisateur/${employee.id}`, { headers: sessionHeaders() }).then((r) => r.json()).then(async (data) => {
         const items: Certification[] = data.data ?? data ?? [];
         // Compatibilité avec d'anciennes données éventuellement dupliquées.
         // L'API est désormais protégée par une contrainte unique, mais cette
         // déduplication évite d'afficher deux cartes pendant la migration.
         const unique = Array.from(new Map(items.map((item) => [`${item.nom_certification}|${item.date_obtention}`, item])).values());
         setCertifications(unique);
+        const completed = await Promise.all(unique.filter((item) => item.formation_id).map(async (item) => {
+          try {
+            const response = await fetch(`${API_URL}/formations/${item.formation_id}`, { headers: sessionHeaders() });
+            if (!response.ok) return null;
+            const formation = await response.json();
+            return { id: `cert-${item.id}`, statut: 'terminee', training_session: { formation_id: item.formation_id, date_debut: item.date_obtention, formation } } as Enrollment;
+          } catch {
+            return null;
+          }
+        }));
+        setEnrollments((current) => [...current, ...completed.filter((item): item is Enrollment => item !== null && !current.some((existing) => existing.training_session.formation_id === item.training_session.formation_id))]);
       }).catch(() => setCertifications([]));
   }, [employee]);
   const completed = certifications.length;

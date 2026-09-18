@@ -1,10 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+
+function sessionHeaders(): Record<string, string> {
+  try {
+    const raw = window.localStorage.getItem('rh-ia-employee-session');
+    const token = raw ? (JSON.parse(raw) as { token?: string }).token : undefined;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
 
 type Notice = {
   id: string;
@@ -49,6 +59,16 @@ export function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    return () => document.removeEventListener('pointerdown', closeOnOutsideClick);
+  }, [open]);
 
   useEffect(() => {
     if (!employee) {
@@ -64,21 +84,13 @@ export function NotificationCenter() {
           enrollmentsResponse,
           certificationsResponse,
         ] = await Promise.all([
-          fetch(
-            `${API_URL}/learning-tasks?utilisateur_id=${employee.id}`,
-          ),
+          fetch(`${API_URL}/learning-tasks?utilisateur_id=${employee.id}`, { headers: sessionHeaders() }),
 
-          fetch(
-            `${API_URL}/performance-events?utilisateur_id=${employee.id}`,
-          ),
+          fetch(`${API_URL}/performance-events?utilisateur_id=${employee.id}`, { headers: sessionHeaders() }),
 
-          fetch(
-            `${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=20`,
-          ),
+          fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=20`, { headers: sessionHeaders() }),
 
-          fetch(
-            `${API_URL}/certifications/utilisateur/${employee.id}`,
-          ),
+          fetch(`${API_URL}/certifications/utilisateur/${employee.id}`, { headers: sessionHeaders() }),
         ]);
 
         const tasks: LearningTask[] = tasksResponse.ok
@@ -266,7 +278,7 @@ export function NotificationCenter() {
    */
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative">
       {/* BOUTON NOTIFICATIONS */}
 
       <button

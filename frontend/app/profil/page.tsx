@@ -9,6 +9,15 @@ import { AppShell } from '../../components/ui/AppShell';
 import AISignature from '../../components/ui/AISignature';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+function sessionHeaders(): Record<string, string> {
+  try {
+    const raw = window.localStorage.getItem('rh-ia-employee-session');
+    const token = raw ? (JSON.parse(raw) as { token?: string }).token : undefined;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
 const POSTS = [
   { id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', label: 'Développeur frontend' },
   { id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', label: 'Ingénieur logiciel senior' },
@@ -70,11 +79,11 @@ export default function ProfilPage() {
     if (!employee) return;
     fillForm();
     Promise.all([
-      fetch(`${API_URL}/certifications/utilisateur/${employee.id}`).then((res) => res.ok ? res.json() : []),
-      fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=20`).then((res) => res.ok ? res.json() : { data: [] }),
-      fetch(`${API_URL}/lot3/contracts?employee_id=${employee.id}`).then((res) => res.ok ? res.json() : []),
-      fetch(`${API_URL}/lot3/diplomas?employee_id=${employee.id}`).then((res) => res.ok ? res.json() : []),
-      fetch(`${API_URL}/lot3/documents?employee_id=${employee.id}`).then((res) => res.ok ? res.json() : []),
+      fetch(`${API_URL}/certifications/utilisateur/${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
+      fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=20`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : { data: [] }),
+      fetch(`${API_URL}/lot3/contracts?employee_id=${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
+      fetch(`${API_URL}/lot3/diplomas?employee_id=${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
+      fetch(`${API_URL}/lot3/documents?employee_id=${employee.id}`, { headers: sessionHeaders() }).then((res) => res.ok ? res.json() : []),
     ]).then(([certs, enrollmentResult, contractResult, diplomaResult, documentResult]) => { setCertifications(certs); setEnrollments(enrollmentResult.data ?? []); setContracts(contractResult); setDiplomas(diplomaResult); setDocuments(documentResult); }).catch(() => {});
   }, [employee, fillForm]);
   useEffect(() => {

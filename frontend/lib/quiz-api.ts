@@ -13,10 +13,27 @@ import type {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
 
+/** Ajoute le jeton de session aux appels qui nécessitent l'authentification. */
+function authHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+
+  try {
+    const raw = window.localStorage.getItem('rh-ia-employee-session');
+    const token = raw ? (JSON.parse(raw) as { token?: string }).token : undefined;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
     ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+      ...(init?.headers ?? {}),
+    },
   });
 
   if (!res.ok) {

@@ -1,0 +1,192 @@
+rh-ia-formation
+├── RAPPORT_TRAVAIL_RH_IA_LOT8.md
+├── README.md
+├── arborescence-projet.txt
+├── backend
+│   ├── README.md
+│   ├── docker-compose.yml
+│   ├── docs
+│   │   ├── AI-RECOMMENDATIONS.md
+│   │   ├── API.md
+│   │   └── DATABASE-ER.md
+│   ├── eslint.config.mjs
+│   ├── init-db
+│   │   └── 01-init-extensions.sql
+│   ├── migrations
+│   │   ├── 001_schema_competences.sql
+│   │   ├── 002_schema_formations.sql
+│   │   ├── 004_formation_competences.sql
+│   │   ├── 005_donnees_test_etendues.sql
+│   │   ├── 006_formations_autres_competences.sql
+│   │   ├── 008_fix_quiz_uuids.sql
+│   │   ├── 009_learning_tasks_and_quiz_profile.sql
+│   │   ├── 010_performance_events.sql
+│   │   ├── 011_seed_professional_skills_quiz_answers.sql
+│   │   ├── 012_enrollment_contact_details.sql
+│   │   ├── 013_diverse_professional_skills_quiz.sql
+│   │   ├── 014_curated_moroccan_employee_matrix.sql
+│   │   ├── 015_employee_accounts.sql
+│   │   ├── 016_professional_skills_quiz_profile_link.sql
+│   │   ├── 017_backfill_professional_skills_quiz_certificates.sql
+│   │   ├── 018_employee_profile.sql
+│   │   ├── 019_two_sessions_per_formation.sql
+│   │   ├── 020_align_certificate_dates.sql
+│   │   ├── 022_employee_lot3_profile.sql
+│   │   ├── 023_lot3_employee_documents.sql
+│   │   ├── 024_unique_certifications_per_employee.sql
+│   │   ├── 025_seed_amal_competences.sql
+│   │   ├── 026_add_three_postes_competence_matrix.sql
+│   │   ├── 027_presentiel_formations.sql
+│   │   ├── 028_remove_presentiel_quizzes.sql
+│   │   └── migration_quiz_complete.sql
+│   ├── nest-cli.json
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │   ├── ai
+│   │   │   ├── ai.module.ts
+│   │   │   ├── ai.service.spec.ts
+│   │   │   └── ai.service.ts
+│   │   ├── app
+│   │   │   ├── app.controller.spec.ts
+│   │   │   ├── app.controller.ts
+│   │   │   ├── app.module.ts
+│   │   │   └── app.service.ts
+│   │   ├── auth
+│   │   │   ├── auth.controller.spec.ts
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.module.ts
+│   │   │   ├── auth.service.spec.ts
+│   │   │   ├── auth.service.ts
+│   │   │   ├── dto
+│   │   │   ├── entities
+│   │   │   └── guards
+│   │   ├── chatbot
+│   │   │   ├── chatbot.controller.spec.ts
+│   │   │   ├── chatbot.controller.ts
+│   │   │   ├── chatbot.module.ts
+│   │   │   ├── chatbot.service.spec.ts
+│   │   │   ├── chatbot.service.ts
+│   │   │   └── dto
+│   │   ├── common
+│   │   │   └── filters
+│   │   ├── competences
+│   │   │   ├── certifications
+│   │   │   ├── competence-gap.controller.ts
+│   │   │   ├── competence-gap.service.ts
+│   │   │   ├── competence-matrices.controller.ts
+│   │   │   ├── competence-matrices.service.ts
+│   │   │   ├── competences.controller.spec.ts
+│   │   │   ├── competences.controller.ts
+│   │   │   ├── competences.module.ts
+│   │   │   ├── competences.service.spec.ts
+│   │   │   ├── competences.service.ts
+│   │   │   ├── dto
+│   │   │   ├── employee-competences.controller.ts
+│   │   │   ├── employee-competences.service.ts
+│   │   │   └── entities
+│   │   ├── formations
+│   │   │   ├── dto
+│   │   │   ├── enrollments
+│   │   │   ├── entities
+│   │   │   ├── formations.controller.spec.ts
+│   │   │   ├── formations.controller.ts
+│   │   │   ├── formations.module.ts
+│   │   │   ├── formations.service.spec.ts
+│   │   │   ├── formations.service.ts
+│   │   │   ├── learning-tasks
+│   │   │   ├── performance-events
+│   │   │   ├── quiz
+│   │   │   ├── quiz-answers
+│   │   │   ├── quiz-attempts
+│   │   │   ├── quiz-questions
+│   │   │   ├── quiz-results
+│   │   │   └── training-sessions
+│   │   ├── lot3
+│   │   │   ├── dto
+│   │   │   ├── entities
+│   │   │   ├── lot3.controller.ts
+│   │   │   └── lot3.module.ts
+│   │   ├── main.ts
+│   │   └── storage
+│   │       ├── minio.service.ts
+│   │       └── storage.module.ts
+│   ├── test
+│   │   ├── app.e2e-spec.ts
+│   │   └── jest-e2e.json
+│   ├── tsconfig.build.json
+│   └── tsconfig.json
+├── frontend
+│   ├── AGENTS.md
+│   ├── CLAUDE.md
+│   ├── README.md
+│   ├── app
+│   │   ├── certifications
+│   │   │   └── [id]
+│   │   ├── competences
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── connexion
+│   │   │   └── page.tsx
+│   │   ├── favicon.ico
+│   │   ├── formations
+│   │   │   └── [id]
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx
+│   │   ├── page.tsx
+│   │   ├── profil
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── quiz
+│   │   │   └── [id]
+│   │   └── support
+│   │       └── page.tsx
+│   ├── components
+│   │   ├── auth
+│   │   │   ├── AuthProvider.tsx
+│   │   │   └── EmployeeAccess.tsx
+│   │   ├── competences
+│   │   │   ├── CompetencyGapAnalysis.tsx
+│   │   │   ├── ExpertIdentification.tsx
+│   │   │   └── Matrix.tsx
+│   │   ├── formations
+│   │   │   ├── FormationCatalog.tsx
+│   │   │   ├── FormationDetail.tsx
+│   │   │   ├── MyFormations.tsx
+│   │   │   ├── QuizPlayer.tsx
+│   │   │   └── RecommendedTrainings.tsx
+│   │   ├── lot3
+│   │   │   └── Lot3Editor.tsx
+│   │   └── ui
+│   │       ├── AISignature.tsx
+│   │       ├── AppShell.tsx
+│   │       ├── Button.tsx
+│   │       ├── Card.tsx
+│   │       ├── Chatbot.tsx
+│   │       ├── NotificationCenter.tsx
+│   │       ├── Spinner.tsx
+│   │       └── formulaire
+│   ├── eslint.config.mjs
+│   ├── lib
+│   │   ├── api.ts
+│   │   ├── employee-presentation.ts
+│   │   └── quiz-api.ts
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── playwright.config.ts
+│   ├── postcss.config.mjs
+│   ├── public
+│   ├── tests
+│   │   ├── employee-auth.spec.ts
+│   │   ├── formation-competences.spec.ts
+│   │   ├── learning-journey.spec.ts
+│   │   ├── quiz-certification-flow.spec.ts
+│   │   ├── quiz-performance.spec.ts
+│   │   └── quiz-single-choice.spec.ts
+│   ├── tsconfig.json
+│   ├── tsconfig.tsbuildinfo
+│   └── types
+│       └── quiz.ts
+├── swagger-improved.json
+└── swagger-local.json

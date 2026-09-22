@@ -8,6 +8,8 @@ import { FormationsModule } from '../formations/formations.module';
 import { AuthModule } from '../auth/auth.module';
 import { Lot3Module } from '../lot3/lot3.module';
 import { ChatbotModule } from '../chatbot/chatbot.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -43,5 +45,7 @@ import { ChatbotModule } from '../chatbot/chatbot.module';
     Lot3Module,
     ChatbotModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,0 +1,2 @@
+import { ChatbotController } from './chatbot.controller';
+describe('ChatbotController', () => { it('délègue le message au service', async () => { const service: any = { answer: jest.fn().mockResolvedValue({ message: 'ok' }) }; const result = await new ChatbotController(service).message({ utilisateur_id: 'u', message: 'bonjour' } as any); expect(result).toEqual({ message: 'ok' }); expect(service.answer).toHaveBeenCalledWith('u', 'bonjour'); }); });

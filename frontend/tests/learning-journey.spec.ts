@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, request as playwrightRequest, test, type APIRequestContext } from '@playwright/test';
 
 const API_URL = 'http://localhost:3000/api';
 type ApiList<T> = T[] | { data: T[] };
@@ -8,7 +8,8 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
   test('profil → écarts → recommandation → inscription → quiz → événements', async ({
     request,
   }) => {
-    const utilisateurId = crypto.randomUUID();
+    let utilisateurId: string;
+    let api!: APIRequestContext;
 
     // Identifiants des ressources créées pendant le test, nettoyés en fin
     // de test quel que soit le résultat (succès ou échec d'une assertion).
@@ -17,12 +18,40 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
     let enrollmentId: string | undefined;
 
     try {
-      const competencesResponse = await request.get(`${API_URL}/competences?limit=1`);
+      // Le scénario utilise les routes métier protégées : créer d'abord
+      // un vrai compte E2E et propager son token à toutes les requêtes.
+      const postesResponse = await request.get(
+        `${API_URL}/competence-matrices/postes/liste`,
+      );
+      expect(postesResponse.ok()).toBeTruthy();
+      const postes = (await postesResponse.json()) as string[];
+      expect(postes.length).toBeGreaterThan(0);
+
+      const registerResponse = await request.post(`${API_URL}/auth/register`, {
+        data: {
+          nom_complet: 'Test E2E Maroc',
+          email_professionnel: `e2e-${crypto.randomUUID()}@entreprise.ma`,
+          mot_de_passe: 'MotDePasseE2E123!',
+          poste_id: postes[0],
+          type_contrat: 'CDI',
+        },
+      });
+      expect(registerResponse.ok(), await registerResponse.text()).toBeTruthy();
+      const authSession = (await registerResponse.json()) as {
+        token: string;
+        employee: { id: string };
+      };
+      utilisateurId = authSession.employee.id;
+      api = await playwrightRequest.newContext({
+        extraHTTPHeaders: { Authorization: `Bearer ${authSession.token}` },
+      });
+
+      const competencesResponse = await api.get(`${API_URL}/competences?limit=1`);
       expect(competencesResponse.ok()).toBeTruthy();
       const competences = list<{ id: string }>(await competencesResponse.json());
       expect(competences[0]?.id).toBeTruthy();
 
-      const profileResponse = await request.post(`${API_URL}/employee-competences`, {
+      const profileResponse = await api.post(`${API_URL}/employee-competences`, {
         data: {
           utilisateur_id: utilisateurId,
           competence_id: competences[0].id,
@@ -32,21 +61,15 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
       });
       expect(profileResponse.ok()).toBeTruthy();
 
-      const postesResponse = await request.get(
-        `${API_URL}/competence-matrices/postes/liste`,
-      );
-      expect(postesResponse.ok()).toBeTruthy();
-      const postes = (await postesResponse.json()) as string[];
-      expect(postes.length).toBeGreaterThan(0);
       expect(
         (
-          await request.get(
+          await api.get(
             `${API_URL}/competences/gaps/${utilisateurId}?posteId=${postes[0]}`,
           )
         ).ok(),
       ).toBeTruthy();
 
-      const recommendationsResponse = await request.get(
+      const recommendationsResponse = await api.get(
         `${API_URL}/competences/recommendations/${utilisateurId}?posteId=${postes[0]}`,
       );
       expect(recommendationsResponse.ok()).toBeTruthy();
@@ -55,9 +78,9 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
       };
       expect(recommendations.recommandations.length).toBeGreaterThan(0);
       const formationId = recommendations.recommandations[0].formation_id;
-      expect((await request.get(`${API_URL}/formations/${formationId}`)).ok()).toBeTruthy();
+      expect((await api.get(`${API_URL}/formations/${formationId}`)).ok()).toBeTruthy();
 
-      const sessionResponse = await request.post(`${API_URL}/training-sessions`, {
+      const sessionResponse = await api.post(`${API_URL}/training-sessions`, {
         data: {
           formation_id: formationId,
           date_debut: '2030-01-01T09:00:00.000Z',
@@ -71,7 +94,7 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
       const session = JSON.parse(sessionBody) as { id: string };
       sessionId = session.id;
 
-      const enrollmentResponse = await request.post(`${API_URL}/enrollments`, {
+      const enrollmentResponse = await api.post(`${API_URL}/enrollments`, {
         data: {
           utilisateur_id: utilisateurId,
           training_session_id: session.id,
@@ -85,7 +108,7 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
       const enrollment = (await enrollmentResponse.json()) as { id: string };
       enrollmentId = enrollment.id;
 
-      const tasksResponse = await request.get(
+      const tasksResponse = await api.get(
         `${API_URL}/learning-tasks?utilisateur_id=${utilisateurId}`,
       );
       expect(tasksResponse.ok()).toBeTruthy();
@@ -95,7 +118,7 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
         ),
       ).toBeTruthy();
 
-      const enrollmentEventsResponse = await request.get(
+      const enrollmentEventsResponse = await api.get(
         `${API_URL}/performance-events?utilisateur_id=${utilisateurId}`,
       );
       expect(enrollmentEventsResponse.ok()).toBeTruthy();
@@ -105,13 +128,13 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
         ),
       ).toBeTruthy();
 
-      const linkResponse = await request.post(
+      const linkResponse = await api.post(
         `${API_URL}/formations/${formationId}/competences/${competences[0].id}`,
         { data: { niveauVise: 2 } },
       );
       expect(linkResponse.ok(), await linkResponse.text()).toBeTruthy();
 
-      const quizCreateResponse = await request.post(`${API_URL}/quizzes`, {
+      const quizCreateResponse = await api.post(`${API_URL}/quizzes`, {
         data: {
           formation_id: formationId,
           titre: `Certification E2E ${utilisateurId}`,
@@ -126,13 +149,13 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
       // Type aligné sur les 3 types canoniques utilisés partout ailleurs
       // dans le projet (multiple_choice / vrai_faux / reponse_libre),
       // plutôt que "choix_unique" qui n'existe nulle part ailleurs.
-      const questionResponse = await request.post(`${API_URL}/quiz-questions`, {
+      const questionResponse = await api.post(`${API_URL}/quiz-questions`, {
         data: { quiz_id: quiz.id, question: 'Question E2E', type: 'multiple_choice', ordre: 1 },
       });
       expect(questionResponse.ok()).toBeTruthy();
       const question = (await questionResponse.json()) as { id: string };
 
-      const correctAnswerResponse = await request.post(`${API_URL}/quiz-answers`, {
+      const correctAnswerResponse = await api.post(`${API_URL}/quiz-answers`, {
         data: { question_id: question.id, answer: 'Bonne réponse', est_correcte: true, ordre: 1 },
       });
       expect(correctAnswerResponse.ok()).toBeTruthy();
@@ -140,12 +163,12 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
 
       // Une deuxième option incorrecte, pour que la question ne soit pas
       // triviale à choix unique forcé — reflète mieux un vrai QCM.
-      const wrongAnswerResponse = await request.post(`${API_URL}/quiz-answers`, {
+      const wrongAnswerResponse = await api.post(`${API_URL}/quiz-answers`, {
         data: { question_id: question.id, answer: 'Mauvaise réponse', est_correcte: false, ordre: 2 },
       });
       expect(wrongAnswerResponse.ok()).toBeTruthy();
 
-      const quizResponse = await request.post(`${API_URL}/quiz-attempts`, {
+      const quizResponse = await api.post(`${API_URL}/quiz-attempts`, {
         data: {
           quiz_id: quiz.id,
           utilisateur_id: utilisateurId,
@@ -162,7 +185,7 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
 
       // Vérification persistée : le profil, pas seulement la réponse du quiz,
       // reflète le niveau cible de la formation réussie.
-      const updatedProfileResponse = await request.get(
+      const updatedProfileResponse = await api.get(
         `${API_URL}/employee-competences/${utilisateurId}`,
       );
       expect(updatedProfileResponse.ok()).toBeTruthy();
@@ -180,7 +203,7 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
         ),
       ).toBeTruthy();
 
-      const quizEventsResponse = await request.get(
+      const quizEventsResponse = await api.get(
         `${API_URL}/performance-events?utilisateur_id=${utilisateurId}`,
       );
       expect(quizEventsResponse.ok()).toBeTruthy();
@@ -191,14 +214,15 @@ test.describe('Parcours E2E Formation, Compétences et Performance', () => {
       ).toBeTruthy();
     } finally {
       if (quizId) {
-        await request.delete(`${API_URL}/quizzes/${quizId}`).catch(() => {});
+        await api.delete(`${API_URL}/quizzes/${quizId}`).catch(() => {});
       }
       if (enrollmentId) {
-        await request.delete(`${API_URL}/enrollments/${enrollmentId}`).catch(() => {});
+        await api.delete(`${API_URL}/enrollments/${enrollmentId}`).catch(() => {});
       }
       if (sessionId) {
-        await request.delete(`${API_URL}/training-sessions/${sessionId}`).catch(() => {});
+        await api.delete(`${API_URL}/training-sessions/${sessionId}`).catch(() => {});
       }
+      if (api) await api.dispose();
     }
   });
 });

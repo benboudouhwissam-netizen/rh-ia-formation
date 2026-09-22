@@ -40,6 +40,8 @@ type Enrollment = {
   id: string;
   training_session?: {
     date_debut: string;
+    formation_id?: string;
+    formation?: { modalite?: string; titre?: string };
   };
 };
 
@@ -157,11 +159,20 @@ export function NotificationCenter() {
          * ---------------------------------------------------------
          */
 
-        const sessionNotices: Notice[] = (
-          enrollmentsResponseData.data ?? []
-        )
+        const enrollmentItems = enrollmentsResponseData.data ?? [];
+        const expiredElearningNotices: Notice[] = enrollmentItems
+          .filter((item) => item.training_session?.date_debut && item.training_session.formation?.modalite === 'e_learning' && new Date(item.training_session.date_debut).getTime() < Date.now())
+          .map((item) => ({
+            id: `expired-e-learning-${item.id}`,
+            message: `La session e-learning${item.training_session?.formation?.titre ? ` « ${item.training_session.formation.titre} »` : ''} est dépassée. Veuillez vous réinscrire pour reprendre la formation.`,
+            created_at: item.training_session!.date_debut,
+            href: item.training_session?.formation_id ? `/formations/${item.training_session.formation_id}` : '/',
+            priority: 2,
+          }));
+        const sessionNotices: Notice[] = enrollmentItems
           .filter((item) => {
             if (!item.training_session?.date_debut) return false;
+            if (item.training_session.formation?.modalite === 'e_learning' && new Date(item.training_session.date_debut).getTime() < Date.now()) return false;
             const daysUntil = (new Date(item.training_session.date_debut).getTime() - Date.now()) / 86_400_000;
             return daysUntil >= 0 && daysUntil <= 7;
           })
@@ -208,6 +219,7 @@ export function NotificationCenter() {
         const allNotices = [
           ...taskNotices,
           ...eventNotices,
+          ...expiredElearningNotices,
           ...sessionNotices,
           ...certificateNotices,
         ];

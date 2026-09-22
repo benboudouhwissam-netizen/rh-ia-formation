@@ -44,10 +44,11 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
     trainingSessionsApi
       .listByFormation(formationId)
       .then((data) => {
-        if (!cancelled) setSessions(data.data ?? []);
-        if (!cancelled) setSelectedSessionId(data.data[0]?.id ?? null);
-        if (!cancelled && data.data[0]?.id) {
-          enrollmentsApi.listForSession(data.data[0].id, utilisateurId)
+        const upcomingSessions = (data.data ?? []).filter((session) => new Date(session.date_debut).getTime() >= Date.now());
+        if (!cancelled) setSessions(upcomingSessions);
+        if (!cancelled) setSelectedSessionId(upcomingSessions[0]?.id ?? null);
+        if (!cancelled && upcomingSessions[0]?.id) {
+          enrollmentsApi.listForSession(upcomingSessions[0].id, utilisateurId)
             .then((enrollments) => {
               if (!cancelled) setAlreadyEnrolled(enrollments.data.length > 0);
             })
@@ -76,7 +77,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
         statut: 'planifiee',
       });
       const refreshed = await trainingSessionsApi.listByFormation(formationId);
-      setSessions(refreshed.data ?? []);
+      setSessions((refreshed.data ?? []).filter((session) => new Date(session.date_debut).getTime() >= Date.now()));
       setSelectedSessionId(created.id);
       setSessionDate('');
       setSessionLieu('');
@@ -93,7 +94,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
     try {
       await formationsApi.inscrire(selectedSessionId, utilisateurId, { nomComplet: employee.nom_complet, emailProfessionnel: employee.email_professionnel });
       const refreshed = await trainingSessionsApi.listByFormation(formationId);
-      setSessions(refreshed.data ?? []);
+      setSessions((refreshed.data ?? []).filter((session) => new Date(session.date_debut).getTime() >= Date.now()));
       setInscriptionStatut('success');
       window.dispatchEvent(new Event('rh-notifications-refresh'));
     } catch {

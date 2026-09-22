@@ -29,6 +29,7 @@ export function MyFormations({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [currentTime] = useState(() => Date.now());
   useEffect(() => {
     if (!employee) return;
     fetch(`${API_URL}/enrollments?utilisateur_id=${employee.id}&limit=50`, { headers: sessionHeaders() }).then((r) => r.json()).then((data) => setEnrollments((current) => [...(data.data ?? []), ...current.filter((item) => item.id.startsWith('cert-'))])).catch(() => setEnrollments([]));
@@ -53,7 +54,12 @@ export function MyFormations({ onClose }: { onClose: () => void }) {
       }).catch(() => setCertifications([]));
   }, [employee]);
   const completed = certifications.length;
-  const total = enrollments.length + certifications.length;
+  const visibleEnrollments = enrollments.filter((item) => {
+    const expired = new Date(item.training_session.date_debut).getTime() < currentTime;
+    const eLearning = item.training_session.formation?.modalite === 'e_learning';
+    return !(expired && eLearning && !isFormationTerminee(item.statut, item.training_session.formation_id, certifications));
+  });
+  const total = visibleEnrollments.length + certifications.length;
   const progress = total ? Math.min(100, Math.round((completed / total) * 100)) : 0;
 
   return (
@@ -72,7 +78,7 @@ export function MyFormations({ onClose }: { onClose: () => void }) {
       <div className="relative grid gap-8 lg:grid-cols-2 lg:before:absolute lg:before:bottom-0 lg:before:left-1/2 lg:before:top-0 lg:before:w-px lg:before:bg-ardoise/15">
         <div className="space-y-5 lg:pr-10">
           <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-ardoise">Inscriptions</h3>
-          {enrollments.length ? enrollments.map((item) => (
+          {visibleEnrollments.length ? visibleEnrollments.map((item) => (
             <article key={item.id} className={`relative rounded-lg border border-ardoise/12 bg-white p-4 shadow-sm lg:after:absolute lg:after:right-[-2.9rem] lg:after:top-7 lg:after:h-3 lg:after:w-3 lg:after:rounded-full lg:after:border-4 lg:after:border-brume ${isFormationTerminee(item.statut, item.training_session.formation_id, certifications) ? 'lg:after:bg-sauge' : 'lg:after:bg-ardoise'}`}>
               <span className={`rounded px-2 py-1 font-mono text-[10px] font-semibold uppercase ${isFormationTerminee(item.statut, item.training_session.formation_id, certifications) ? 'bg-sauge/10 text-sauge-700' : 'bg-ardoise/10 text-ardoise-700'}`}>{isFormationTerminee(item.statut, item.training_session.formation_id, certifications) ? 'Terminée' : item.statut}</span>
               <h4 className="mt-3 font-heading text-base font-semibold text-encre">{item.training_session.formation?.titre ?? 'Formation inscrite'}</h4>

@@ -72,8 +72,10 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
       const created = await trainingSessionsApi.create({
         formation_id: formationId,
         date_debut: new Date(`${sessionDate}T09:00:00`).toISOString(),
-        lieu: sessionLieu || undefined,
-        capacite: sessionCapacite ? Number(sessionCapacite) : undefined,
+        ...(formation?.modalite === 'presentiel' ? {
+          lieu: sessionLieu || undefined,
+          capacite: sessionCapacite ? Number(sessionCapacite) : undefined,
+        } : {}),
         statut: 'planifiee',
       });
       const refreshed = await trainingSessionsApi.listByFormation(formationId);
@@ -156,14 +158,14 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
                 className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20"
               />
             </label>
-            <label className="flex min-w-[180px] flex-1 flex-col gap-1 font-body text-sm text-encre">
+            {formation.modalite === 'presentiel' && <label className="flex min-w-[180px] flex-1 flex-col gap-1 font-body text-sm text-encre">
               <span className="font-semibold">Salle</span>
               <input value={sessionLieu} onChange={(event) => setSessionLieu(event.target.value)} placeholder="Salle Atlas" className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20" />
-            </label>
-            <label className="flex w-36 flex-col gap-1 font-body text-sm text-encre">
+            </label>}
+            {formation.modalite === 'presentiel' && <label className="flex w-36 flex-col gap-1 font-body text-sm text-encre">
               <span className="font-semibold">Places</span>
               <input type="number" min="1" value={sessionCapacite} onChange={(event) => setSessionCapacite(event.target.value)} placeholder="20" className="rounded-lg border border-ardoise/25 px-3 py-2 outline-none focus:border-sauge focus:ring-2 focus:ring-sauge/20" />
-            </label>
+            </label>}
             <button
               type="submit"
               disabled={!sessionDate || sessionCreationStatut === 'loading'}
@@ -214,7 +216,7 @@ export function FormationDetail({ formationId, utilisateurId }: FormationDetailP
                       year: 'numeric',
                     })}
                   </p>
-                  <p className="mt-1 font-body text-xs text-ardoise">{session.lieu ?? 'Salle à confirmer'} · {session.places_restantes == null ? 'Places non limitées' : `${session.places_restantes} place${session.places_restantes > 1 ? 's' : ''} restante${session.places_restantes > 1 ? 's' : ''}`}</p>
+                  <p className="mt-1 font-body text-xs text-ardoise">{formation.modalite === 'presentiel' ? `${session.lieu ?? 'Salle à confirmer'} · ${session.places_restantes == null ? 'Places non limitées' : `${session.places_restantes} place${session.places_restantes > 1 ? 's' : ''} restante${session.places_restantes > 1 ? 's' : ''}`}` : 'Accès en ligne · Formation e-learning'}</p>
                   </div>
                 </label>
               </li>
